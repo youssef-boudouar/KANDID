@@ -52,4 +52,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class);
     }
+    public function jobOffers()
+    {
+        return $this->hasMany(JobOffer::class, 'created_by');
+    }
 }
