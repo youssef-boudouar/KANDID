@@ -9,7 +9,7 @@ class JobOfferController extends Controller
 {
     public function index(Request $request)
     {
-        $jobOffers = JobOffer::where('company_id', $request->user()->company_id)
+        $jobOffers = JobOffer::where('company_id', $request->user()->company_id)->get();
 
         return response()->json($jobOffers);
     }
@@ -24,6 +24,7 @@ class JobOfferController extends Controller
 
         $jobOffer = JobOffer::create(array_merge($validated, [
             'company_id' => $request->user()->company_id,
+            'created_by' =>$request->user()->id,
         ]));
 
         return response()->json($jobOffer, 201);
