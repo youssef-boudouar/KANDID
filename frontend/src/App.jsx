@@ -1,15 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Login from './pages/Login'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import JobOffers from './pages/JobOffers';
+import Login from './pages/Login';
+import Register from './pages/Register';
+
 
 function App() {
     return (
-        <div>
-            <Login />
-        </div>
+        <BrowserRouter>
+            <Routes>
+                {/* Public */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                {/* <Route path="/jobs" element={<PublicJobs />} /> */}
+
+                {/* Recruiter only routes */}
+                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+                <Route path="/job-offers" element={<JobOffers />} />
+                {/* <Route path="/job-offers/create" element={<CreateJob />} /> */}
+
+                {/* Unknown URL*/}
+                <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+        </BrowserRouter>
     );
 }
 
-export default App
+export default App;
+
