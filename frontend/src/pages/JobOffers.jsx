@@ -132,7 +132,7 @@ function JobOffers() {
                         {filteredJobs.map(job => {
                             const status = getStatusStyle(job.status);
                             return (
-                            <div key={job.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 hover:-translate-y-1 hover:border-gray-200 transition-all duration-500 ease-out cursor-pointer group">
+                            <div key={job.id} onClick={() => navigate(`/job-offers/${job.id}`)} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 hover:-translate-y-1 hover:border-gray-200 transition-all duration-500 ease-out cursor-pointer group">
 
                                 {/* Accent Bar */}
                                 <div className={`h-[3px] w-full ${status.bar}`} />
