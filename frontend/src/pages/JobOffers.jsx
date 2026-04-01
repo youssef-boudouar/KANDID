@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function JobOffers() {
+    const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -65,7 +67,7 @@ function JobOffers() {
                         <h1 className="text-3xl font-extrabold text-gray-900">Job Offers</h1>
                         <p className="text-gray-500 mt-1">Manage your active recruitment pipelines and internal talent needs.</p>
                     </div>
-                    <button className="bg-black text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors flex items-center gap-2">
+                    <button onClick={() => navigate('/job-offers/create')} className="bg-black text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors flex items-center gap-2">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                             <path d="M12 5v14M5 12h14"/>
                         </svg>
