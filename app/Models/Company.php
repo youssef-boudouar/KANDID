@@ -28,4 +28,9 @@ class Company extends Model
     {
         return $this->hasMany(JobOffer::class);
     }
+
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
+    }
 }
