@@ -21,13 +21,16 @@ class AuthController extends Controller
         ]);
         // Validate Company Infos
         $validatedCompanyInfos = $request->validate([
-            'name' => 'required|string|max:50',
+            'company_name' => 'required|string|max:50',
             'domain' => 'nullable|string|unique:companies',
         ]);
         // ALL OR NOTHING (Either creating company + user (recruiter) Or Fail)
         $result = DB::transaction(function() use ($validatedCompanyInfos, $validatedUserInfos) {
             // create company
-            $company = Company::create($validatedCompanyInfos);
+            $company = Company::create([
+                'name' => $validatedCompanyInfos['company_name'],
+                'domain' => $validatedCompanyInfos['domain'] ?? null,
+            ]);
             // create user (merging already validated data + FK and role in one array)
             $user = User::create(array_merge($validatedUserInfos, ['company_id' => $company->id, 'role' => 'recruiter']));
 
