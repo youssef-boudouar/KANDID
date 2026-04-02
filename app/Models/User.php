@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobOffer::class, 'created_by');
     }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 }
