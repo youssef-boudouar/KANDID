@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\JobOfferController;
 use Illuminate\Http\Request;
@@ -22,5 +23,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/job-offers/{id}', [JobOfferController::class, 'show']);
     Route::put('/job-offers/{id}', [JobOfferController::class, 'update']);
     Route::delete('/job-offers/{id}', [JobOfferController::class, 'destroy']);
+
+    // Applications
+    Route::get('/job-offers/{jobOfferId}/applications', [ApplicationController::class, 'index']);
+    Route::get('/applications/{id}', [ApplicationController::class, 'show']);
+    Route::put('/applications/{id}/move', [ApplicationController::class, 'move']);
+    Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 });
 
