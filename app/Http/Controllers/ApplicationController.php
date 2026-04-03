@@ -33,6 +33,21 @@ class ApplicationController extends Controller
         return response()->json($application);
     }
 
+    public function move(Request $request, $id) // move application on kanban border
+    {
+        $application = Application::whereHas('jobOffer', function ($query) use ($request) {
+                $query->where('company_id', $request->user()->company_id);
+            })->findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:screening,interview,technical,hired,rejected',
+            'kanban_order' => 'required|integer',
+        ]);
+
+        $application->update($validated);
+
+        return response()->json($application);
+    }
 
     public function destroy(Request $request, $id)
     {
