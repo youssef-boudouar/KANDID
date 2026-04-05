@@ -13,6 +13,11 @@ function KanbanBoard()
 
     useEffect(()=>{
         const token = localStorage.getItem('token');
+        axios.get(`http://localhost:8000/api/job-offers/${id}`, {
+            headers : { Authorization : `Bearer ${token}`}
+        }).then(response => {
+            setJobTitle(response.data.title)
+        })
         axios.get(`http://localhost:8000/api/job-offers/${id}/applications`, {
             headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
@@ -44,11 +49,7 @@ function KanbanBoard()
         setApplications(updatedApplications);
 
     }
+    return <div>Kanban Board - {jobTitle}</div>;
 }
-
-
-
-
-
 
 export default KanbanBoard;
