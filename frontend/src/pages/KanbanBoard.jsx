@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
+const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace('/api', '');
+
 function KanbanBoard() {
     const status = ["screening", "interview", "technical", "hired", "rejected"];
 
@@ -705,7 +707,7 @@ function KanbanBoard() {
                             </div>
                             {selectedApp.candidate?.resume_path && (
                                 <a
-                                    href={`http://localhost:8000/storage/${selectedApp.candidate.resume_path}`}
+                                    href={`${STORAGE_URL}/storage/${selectedApp.candidate.resume_path}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
