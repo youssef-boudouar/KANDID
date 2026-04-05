@@ -21,14 +21,14 @@ function CreateJob() {
     }, []);
 
     const handleSubmit = () => {
-    api.post('/job-offers', { title, description, status })
-    .then(() => {
-        navigate('/job-offers');
-    })
-    .catch(() => {
-        setError('Failed to create job offer. Make sure all fields are filled.');
-    });
-};
+        api.post('/job-offers', { title, description, status })
+            .then(() => {
+                navigate('/job-offers');
+            })
+            .catch(() => {
+                setError('Failed to create job offer. Make sure all fields are filled.');
+            });
+    };
 
     const statuses = ['draft', 'active', 'archived'];
 

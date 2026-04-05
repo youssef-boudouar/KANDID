@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace('/api', '');
+const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api$/, '');
 
 function KanbanBoard() {
     const status = ["screening", "interview", "technical", "hired", "rejected"];
