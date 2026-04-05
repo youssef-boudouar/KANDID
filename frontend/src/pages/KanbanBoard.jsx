@@ -20,6 +20,14 @@ function KanbanBoard()
         })
     },[])
 
+    const getByStatus = (status) => {
+        return applications.filter(app => app.status === status);
+    };
 }
+
+
+
+
+
 
 export default KanbanBoard;
