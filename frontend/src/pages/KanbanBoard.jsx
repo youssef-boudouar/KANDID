@@ -13,7 +13,7 @@ function KanbanBoard()
 
     useEffect(()=>{
         const token = localStorage.getItem('token');
-        axios.get('http://localhost:8000/job-offers/${id}/applications', {
+        axios.get(`http://localhost:8000/api/job-offers/${id}/applications`, {
             headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
             setApplications(response.data);
@@ -23,6 +23,27 @@ function KanbanBoard()
     const getByStatus = (status) => {
         return applications.filter(app => app.status === status);
     };
+
+    const onDragEnd = (result) => {
+        if(!result.destination) return; // if the drag was out of droppable zones
+
+        if(result.source.droppableId === result.destination.droppableId // dropped on same place
+            && result.source.index === result.destination.index)
+            return;
+
+
+        const updatedApplications = applications.map((app)=>{
+            if(app.id === parseInt(result.draggableId ))
+            {
+                app.status = result.destination.droppableId ;
+                app.kanban_order = result.destination.index;
+            }
+            return app;
+        })
+
+        setApplications(updatedApplications);
+
+    }
 }
 
 
