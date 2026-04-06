@@ -1,0 +1,93 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Application;
+use App\Models\Candidate;
+use App\Models\JobOffer;
+use Illuminate\Http\Request;
+
+class PublicJobController extends Controller
+{
+    public function index()
+    {
+        $jobs = JobOffer::where('status', 'active')
+        ->with('company:id,name')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return response()->json($jobs);
+    }
+    public function show($id)
+    {
+        $job = JobOffer::where('status', 'active')
+        ->with('company:id,name')
+        ->findOrFail($id);
+
+        return response()->json($job);
+    }
+
+    public function apply(Request $request, $id)
+    {
+        $job = JobOffer::where('status', 'active')->findOrFail($id);
+
+        $validated = $request->validate([
+        'first_name' => 'required|string|max:20',
+        'last_name' => 'required|string|max:20',
+        'email' => 'required|email',
+        'phone' => 'required|string|max:20',
+        'resume' => 'required|file|mimes:pdf|max:2048',
+        ]);
+
+        // check if candidate already exists
+
+        $existingCandidate = Candidate::where('email', $validated['email'])->first();
+
+        if($existingCandidate)
+        {
+            $alreadyApplied = Application::where('candidate_id', $existingCandidate->id)
+            ->where('job_offer_id', $job->id)
+            ->exists();
+            if($alreadyApplied)
+            {
+                return response()->json([
+                    'message' => 'You have already applied to this job offer'
+                ], 409);
+            }
+        }
+
+        // resume upload
+        $resumePath = null;
+        if ($request->hasFile('resume')) {
+            $resumePath = $request->file('resume')->store('resumes', 'public');
+        }
+
+        // create candidate if new
+        $candidate = Candidate::where('email', $validated['email'])->first();
+
+        if (!$candidate) {
+            $candidate = Candidate::create([
+                'first_name' => $validated['first_name'],
+                'last_name'  => $validated['last_name'],
+                'email'      => $validated['email'],
+                'phone'      => $validated['phone'],
+            ]);
+        }
+
+        if ($resumePath) {
+    $candidate->resume_path = $resumePath;
+    $candidate->save();
+}
+
+        $application = Application::create([
+            'candidate_id' => $candidate->id,
+            'job_offer_id' => $job->id,
+            'status' => 'screening',
+            'kanban_order' => 0,
+        ]);
+
+        return response()->json([
+            'message' => 'Application submitted successfully!'
+        ], 201);
+    }
+}

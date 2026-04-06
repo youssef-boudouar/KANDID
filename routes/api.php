@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\JobOfferController;
+use App\Http\Controllers\PublicJobController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 });
 
+Route::get('/public/jobs', [PublicJobController::class, 'index']);
+Route::get('/public/jobs/{id}', [PublicJobController::class, 'show']);
+Route::post('/public/jobs/{id}/apply', [PublicJobController::class, 'apply']);
