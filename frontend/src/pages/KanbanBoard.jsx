@@ -33,21 +33,21 @@ function KanbanBoard() {
             });
     }, []);
 
-    // const getByStatus = (status) => {  // takes status and return only apps that match the status + search
-    //     const results = [];
+    const getByStatus = (status) => {  // takes status and return only apps that match the status + search
+        const results = [];
 
-    //     for (let i = 0; i < applications.length; i++) {
+        for (let i = 0; i < applications.length; i++) {
 
-    //         const fullName = applications[i].candidate.first_name + " " + applications[i].candidate.last_name;
+            const fullName = applications[i].candidate.first_name + " " + applications[i].candidate.last_name;
 
-    //         if ( applications[i].status === status && fullName.toLowerCase().includes(searchQuery.toLowerCase()) )
-    //         {
-    //             results.push(applications[i]);
-    //         }
-    //     }
+            if ( applications[i].status === status && fullName.toLowerCase().includes(searchQuery.toLowerCase()) )
+            {
+                results.push(applications[i]);
+            }
+        }
 
-    //     return results;
-    // };
+        return results;
+    };
 
     const onDragEnd = (result) => {
         if (!result.destination) return; // dropped out of droppable zones
