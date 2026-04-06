@@ -108,6 +108,17 @@ function JobDetails() {
                             </div>
                             <div className="flex gap-3">
                                 <button
+                                    onClick={() => navigate(`/job-offers/${id}/pipeline`)}
+                                    className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl text-sm font-semibold hover:from-blue-600 hover:to-purple-700 transition-all flex items-center gap-2"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="3" y="3" width="5" height="18" rx="1" />
+                                        <rect x="10" y="8" width="5" height="13" rx="1" />
+                                        <rect x="17" y="5" width="5" height="16" rx="1" />
+                                    </svg>
+                                    View Pipeline
+                                </button>
+                                <button
                                     onClick={() => navigate(`/job-offers/${id}/edit`)}
                                     className="px-5 py-2.5 bg-black text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
                                 >
