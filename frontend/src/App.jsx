@@ -5,6 +5,7 @@ import EditJob from './pages/EditJob';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import KanbanBoard from './pages/KanbanBoard';
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
 
                 {/* Unknown URL*/}
                 <Route path="*" element={<Navigate to="/login" />} />
+
+                <Route path="/job-offers/:id/pipeline" element={<KanbanBoard />} />
             </Routes>
         </BrowserRouter>
     );
