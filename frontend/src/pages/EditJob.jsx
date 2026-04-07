@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import RecruiterNavbar from '../components/RecruiterNavbar';
 
 function EditJob() {
     const { id } = useParams();
@@ -10,10 +11,6 @@ function EditJob() {
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
-    const [companyName, setCompanyName] = useState('');
-    const [userName, setUserName] = useState('');
-    const [showInvite, setShowInvite] = useState(false);
-    const [inviteEmail, setInviteEmail] = useState('');
 
     useEffect(() => {
         api.get(`/job-offers/${id}`).then(response => {
@@ -24,11 +21,6 @@ function EditJob() {
         }).catch(() => {
             setError('Failed to load job offer');
             setLoading(false);
-        });
-
-        api.get('/user').then(response => {
-            setUserName(response.data.name);
-            setCompanyName(response.data.company?.name || '');
         });
     }, []);
 
@@ -54,75 +46,7 @@ function EditJob() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
-
-            {/* Top Navigation */}
-            <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
-                <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    <img
-                        src="/kandid_logo.png"
-                        alt="Kandid"
-                        className="h-8 w-auto object-contain select-none"
-                    />
-                    <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                        <span onClick={() => navigate('/dashboard')} className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
-                        <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-700">{companyName}</span>
-                        <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold shadow-md">
-                            {userName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="relative">
-                            {showInvite && <div className="fixed inset-0 z-40" onClick={() => setShowInvite(false)} />}
-                            <button
-                                onClick={() => setShowInvite(!showInvite)}
-                                className="text-xs text-gray-500 hover:text-black transition-colors font-medium"
-                            >
-                                + Invite
-                            </button>
-
-                            {showInvite && (
-                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-72 z-50">
-                                    <p className="text-sm font-bold text-gray-900 mb-3">Invite Team Member</p>
-                                    <input
-                                        type="email"
-                                        value={inviteEmail}
-                                        onChange={(e) => setInviteEmail(e.target.value)}
-                                        placeholder="colleague@company.com"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 mb-3"
-                                    />
-                                    <button
-                                        onClick={() => {
-                                            if (!inviteEmail) return;
-                                            api.post('/team/invite', {
-                                                email: inviteEmail,
-                                            }).then(() => {
-                                                alert('Invitation sent!');
-                                                setInviteEmail('');
-                                                setShowInvite(false);
-                                            }).catch(() => {
-                                                alert('Failed to send invitation');
-                                            });
-                                        }}
-                                        className="w-full py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors"
-                                    >
-                                        Send Invite
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        <button
-                            onClick={() => {
-                                localStorage.removeItem('token');
-                                navigate('/login');
-                            }}
-                            className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium ml-2"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <RecruiterNavbar activePage="job-offers" />
 
             {/* Content Area */}
             <div className="max-w-3xl mx-auto px-8 py-10">
