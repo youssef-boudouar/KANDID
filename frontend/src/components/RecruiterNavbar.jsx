@@ -11,10 +11,12 @@ function RecruiterNavbar({ activePage }) {
     const [inviteStatus, setInviteStatus] = useState('');
 
     useEffect(() => {
-        api.get('/user').then((res) => {
-            setUserName(res.data.name || '');
-            setCompanyName(res.data.company?.name || '');
-        });
+        api.get('/user')
+            .then((res) => {
+                setUserName(res.data.name || '');
+                setCompanyName(res.data.company?.name || '');
+            })
+            .catch(() => {});
     }, []);
 
     const sendInvite = () => {
@@ -61,7 +63,11 @@ function RecruiterNavbar({ activePage }) {
                 <div className="flex-1 flex items-center justify-center gap-6">
                     {navItem('Dashboard', 'dashboard', '/dashboard')}
                     {navItem('Job Offers', 'job-offers', '/job-offers')}
-                    {activePage === 'pipeline' && navItem('Pipeline', 'pipeline', '#')}
+                    {activePage === 'pipeline' && (
+                        <span className="cursor-default text-sm font-bold text-black border-b-2 border-black pb-1">
+                            Pipeline
+                        </span>
+                    )}
                 </div>
 
                 {/* Right side */}
