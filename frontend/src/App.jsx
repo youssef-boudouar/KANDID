@@ -6,6 +6,8 @@ import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import KanbanBoard from './pages/KanbanBoard';
+import PublicJobs from './pages/PublicJobs';
+import PublicJobApply from './pages/PublicJobApply';
 
 
 function App() {
@@ -15,7 +17,8 @@ function App() {
                 {/* Public */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                {/* <Route path="/jobs" element={<PublicJobs />} /> */}
+                <Route path="/jobs" element={<PublicJobs />} />
+                <Route path="/jobs/:id" element={<PublicJobApply />} />
 
                 {/* Recruiter only routes */}
                 {/* <Route path="/dashboard" element={<Dashboard />} /> */}
@@ -23,11 +26,10 @@ function App() {
                 <Route path="/job-offers/create" element={<CreateJob />} />
                 <Route path="/job-offers/:id" element={<JobDetails />} />
                 <Route path="/job-offers/:id/edit" element={<EditJob />} />
+                <Route path="/job-offers/:id/pipeline" element={<KanbanBoard />} />
 
                 {/* Unknown URL*/}
                 <Route path="*" element={<Navigate to="/login" />} />
-
-                <Route path="/job-offers/:id/pipeline" element={<KanbanBoard />} />
             </Routes>
         </BrowserRouter>
     );
