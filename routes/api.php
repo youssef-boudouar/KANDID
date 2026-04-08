@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\JobOfferController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PublicJobController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/applications/{id}', [ApplicationController::class, 'show']);
     Route::put('/applications/{id}/move', [ApplicationController::class, 'move']);
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+
+    Route::get('/applications/{applicationId}/notes', [NoteController::class, 'index']);
+Route::post('/applications/{applicationId}/notes', [NoteController::class, 'store']);
+Route::delete('/notes/{id}', [NoteController::class, 'destroy']);
 });
 
 Route::get('/public/jobs', [PublicJobController::class, 'index']);
