@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from '../context/AuthContext';
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -8,6 +9,7 @@ function AdminDashboard() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
         api.get("/admin/stats")
@@ -57,7 +59,7 @@ function AdminDashboard() {
                     </div>
                     <button
                         onClick={() => {
-                            localStorage.removeItem("token");
+                            logout();
                             navigate('/login');
                         }}
                         className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"

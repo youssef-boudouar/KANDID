@@ -1,6 +1,7 @@
 import { useState} from "react";
 import api from "../api/axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 function Register() {
     const [companyName, setCompanyName] = useState("");
@@ -16,6 +17,7 @@ function Register() {
     const inviteToken = searchParams.get("token");
 
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleRegister = (e) => {
         e.preventDefault();
@@ -31,8 +33,9 @@ function Register() {
                 invite_token: inviteToken,
             })
             .then((response) => {
-                localStorage.setItem("token", response.data.token);
-                navigate("/dashboard");
+                login(response.data.token, response.data.user);
+                const redirectPath = response.data.user.role === 'admin' ? '/admin' : '/dashboard';
+                navigate(redirectPath);
             })
             .catch((err) => {
                 if (err.response?.data?.message) {
