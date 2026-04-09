@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { AuthProvider, ProtectedRoute, AdminRoute } from './context/AuthContext';
 import JobOffers from './pages/JobOffers';
 import CreateJob from './pages/CreateJob';
 import EditJob from './pages/EditJob';
@@ -12,31 +13,27 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
-    const token = localStorage.getItem('token');
-
     return (
         <BrowserRouter>
-            <Routes>
-                {/* Public */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/jobs" element={<PublicJobs />} />
-                <Route path="/jobs/:id" element={<PublicJobApply />} />
+            <AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/jobs" element={<PublicJobs />} />
+                    <Route path="/jobs/:id" element={<PublicJobApply />} />
 
-                {/* Recruiter only routes */}
-                <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
-                <Route path="/job-offers" element={token ? <JobOffers /> : <Navigate to="/login" />} />
-                <Route path="/job-offers/create" element={token ? <CreateJob /> : <Navigate to="/login" />} />
-                <Route path="/job-offers/:id" element={token ? <JobDetails /> : <Navigate to="/login" />} />
-                <Route path="/job-offers/:id/edit" element={token ? <EditJob /> : <Navigate to="/login" />} />
-                <Route path="/job-offers/:id/pipeline" element={token ? <KanbanBoard /> : <Navigate to="/login" />} />
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/job-offers" element={<ProtectedRoute><JobOffers /></ProtectedRoute>} />
+                    <Route path="/job-offers/create" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
+                    <Route path="/job-offers/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
+                    <Route path="/job-offers/:id/edit" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
+                    <Route path="/job-offers/:id/pipeline" element={<ProtectedRoute><KanbanBoard /></ProtectedRoute>} />
 
-                {/* Admin only */}
-                <Route path="/admin" element={token ? <AdminDashboard /> : <Navigate to="/login" />} />
+                    <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
-                {/* False URL */}
-                <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
+                    <Route path="*" element={<Navigate to="/login" />} />
+                </Routes>
+            </AuthProvider>
         </BrowserRouter>
     );
 }

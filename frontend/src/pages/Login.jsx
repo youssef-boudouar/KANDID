@@ -1,6 +1,7 @@
 import { useState} from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ function Login() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -19,7 +21,7 @@ function Login() {
                 password: password,
             })
             .then((response) => {
-                localStorage.setItem("token", response.data.token);
+                login(response.data.token, response.data.user);
                 if (response.data.user.role === "admin") {
                     navigate('/admin');
                 } else {

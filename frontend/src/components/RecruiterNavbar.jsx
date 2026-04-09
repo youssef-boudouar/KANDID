@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
 function RecruiterNavbar({ activePage }) {
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const [userName, setUserName] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [showInvite, setShowInvite] = useState(false);
@@ -117,7 +119,7 @@ function RecruiterNavbar({ activePage }) {
 
                     {/* Logout */}
                     <button
-                        onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
+                        onClick={() => { logout(); navigate('/login'); }}
                         className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium ml-2"
                     >
                         Logout
