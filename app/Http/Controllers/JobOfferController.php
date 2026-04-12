@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
+use App\Http\Requests\StoreJobOfferRequest;
+use App\Http\Requests\UpdateJobOfferRequest;
 use Illuminate\Http\Request;
 
 class JobOfferController extends Controller
@@ -14,13 +16,9 @@ class JobOfferController extends Controller
         return response()->json($jobOffers);
     }
 
-    public function store(Request $request)
+    public function store(StoreJobOfferRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:50',
-            'description' => 'required|string',
-            'status' => 'nullable|string|in:draft,active,archived',
-        ]);
+        $validated = $request->validated();
 
         $jobOffer = JobOffer::create(array_merge($validated, [
             'company_id' => $request->user()->company_id,
@@ -37,16 +35,12 @@ class JobOfferController extends Controller
         return response()->json($jobOffer);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateJobOfferRequest $request, $id)
     {
         $jobOffer = JobOffer::where('company_id', $request->user()->company_id)
             ->findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:50',
-            'description' => 'required|string',
-            'status' => 'required|string|in:draft,active,archived',
-        ]);
+        $validated = $request->validated();
 
         $jobOffer->update($validated);
 

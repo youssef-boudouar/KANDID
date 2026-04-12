@@ -2,68 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Application;
-use App\Models\JobOffer;
+use App\Services\ApplicationService;
+use App\Http\Requests\MoveApplicationRequest;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
+    public function __construct(private ApplicationService $applicationService) {}
 
     public function index(Request $request, $jobOfferId)
     {
-        $jobOffer = JobOffer::where('company_id', $request->user()->company_id)->findOrFail($jobOfferId);
-
-        $applications = Application::where('job_offer_id', $jobOffer->id)->with('candidate')->orderBy('kanban_order')->get();
+        $applications = $this->applicationService->getApplicationsForJob($jobOfferId, $request->user()->company_id);
 
         return response()->json($applications);
     }
 
     public function show(Request $request, $id)
     {
-        $application = Application::findOrFail($id);
+        $application = $this->applicationService->getApplication($id, $request->user()->company_id);
 
-        $jobOffer = JobOffer::findOrFail($application->job_offer_id);
-
-        if ($jobOffer->company_id !== $request->user()->company_id) {
+        if (!$application) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
-
-        $application->load(['candidate', 'jobOffer', 'notes.user']);
 
         return response()->json($application);
     }
 
-    public function move(Request $request, $id)
+    public function move(MoveApplicationRequest $request, $id)
     {
-        $application = Application::findOrFail($id);
+        $validated = $request->validated();
 
-        $jobOffer = JobOffer::findOrFail($application->job_offer_id);
+        $application = $this->applicationService->moveApplication($id, $request->user()->company_id, $validated);
 
-        if ($jobOffer->company_id !== $request->user()->company_id) {
+        if (!$application) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
-
-        $validated = $request->validate([
-            'status' => 'required|string|in:screening,interview,technical,hired,rejected',
-            'kanban_order' => 'required|integer',
-        ]);
-
-        $application->update($validated);
 
         return response()->json($application);
     }
 
     public function destroy(Request $request, $id)
     {
-        $application = Application::findOrFail($id);
+        $deleted = $this->applicationService->deleteApplication($id, $request->user()->company_id);
 
-        $jobOffer = JobOffer::findOrFail($application->job_offer_id);
-
-        if ($jobOffer->company_id !== $request->user()->company_id) {
+        if (!$deleted) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
-
-        $application->delete();
 
         return response()->json(['message' => 'Application deleted']);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use App\Models\Candidate;
 use App\Models\JobOffer;
+use App\Http\Requests\ApplyToJobRequest;
 use Illuminate\Http\Request;
 
 class PublicJobController extends Controller
@@ -22,17 +23,11 @@ class PublicJobController extends Controller
         return response()->json($job);
     }
 
-    public function apply(Request $request, $id)
+    public function apply(ApplyToJobRequest $request, $id)
     {
         $job = JobOffer::where('status', 'active')->findOrFail($id);
 
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:20',
-            'last_name' => 'required|string|max:20',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:20',
-            'resume' => 'required|file|mimes:pdf|max:2048',
-        ]);
+        $validated = $request->validated();
 
         $candidate = Candidate::where('email', $validated['email'])->first();
 
@@ -40,7 +35,7 @@ class PublicJobController extends Controller
             $alreadyApplied = Application::where('candidate_id', $candidate->id)->where('job_offer_id', $job->id)->exists();
 
             if ($alreadyApplied) {
-                return response()->json(['message' => 'You have already applied to this job offer'], 409); // Conflict with existing data
+                return response()->json(['message' => 'You have already applied to this job offer'], 409); 
             }
         }
 

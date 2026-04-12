@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use App\Models\JobOffer;
 use App\Models\Note;
+use App\Http\Requests\StoreNoteRequest;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
@@ -24,7 +25,7 @@ class NoteController extends Controller
         return response()->json($notes);
     }
 
-    public function store(Request $request, $applicationId)
+    public function store(StoreNoteRequest $request, $applicationId)
     {
         $application = Application::findOrFail($applicationId);
 
@@ -34,9 +35,7 @@ class NoteController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $note = Note::create([
             'user_id' => $request->user()->id,
