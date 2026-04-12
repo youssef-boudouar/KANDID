@@ -6,6 +6,7 @@ use App\Models\Application;
 use App\Models\JobOffer;
 use App\Models\Note;
 use App\Http\Requests\StoreNoteRequest;
+use App\Http\Resources\NoteResource;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
@@ -22,7 +23,7 @@ class NoteController extends Controller
 
         $notes = Note::where('application_id', $application->id)->with('user:id,name')->orderBy('created_at', 'desc')->get();
 
-        return response()->json($notes);
+        return NoteResource::collection($notes);
     }
 
     public function store(StoreNoteRequest $request, $applicationId)
@@ -45,7 +46,7 @@ class NoteController extends Controller
 
         $note->load('user:id,name');
 
-        return response()->json($note, 201);
+        return (new NoteResource($note))->response()->setStatusCode(201);
     }
 
     public function destroy(Request $request, $id)
