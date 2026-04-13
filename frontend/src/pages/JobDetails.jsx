@@ -8,6 +8,8 @@ function JobDetails() {
     const [job, setJob] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [companyName, setCompanyName] = useState('');
+    const [userName, setUserName] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -19,6 +21,13 @@ function JobDetails() {
         }).catch(() => {
             setError('Failed to load job offer');
             setLoading(false);
+        });
+
+        axios.get('http://localhost:8000/api/user', {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setUserName(response.data.name);
+            setCompanyName(response.data.company?.name || '');
         });
     }, []);
 
@@ -67,9 +76,9 @@ function JobDetails() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-700">COMPANY NAME</span>
+                        <span className="text-sm font-semibold text-gray-700">{companyName}</span>
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                            A
+                            {userName.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -8,6 +8,18 @@ function CreateJob() {
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        axios.get('http://localhost:8000/api/user', {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setUserName(response.data.name);
+            setCompanyName(response.data.company?.name || '');
+        });
+    }, []);
 
     const handleSubmit = () => {
     const token = localStorage.getItem('token');
@@ -44,9 +56,9 @@ function CreateJob() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-700">COMPANY NAME</span>
+                        <span className="text-sm font-semibold text-gray-700">{companyName}</span>
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                            A
+                            {userName.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </div>
