@@ -5,12 +5,18 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function KanbanBoard() {
     const status = ["screening", "interview", "technical", "hired", "rejected"];
+    
     const [applications, setApplications] = useState([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [jobTitle, setJobTitle] = useState("");
     const [jobStatus, setJobStatus] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedApp, setSelectedApp] = useState(null);
+    const [notes, setNotes] = useState([]);
+    const [newNote, setNewNote] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [userName, setUserName] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +37,13 @@ function KanbanBoard() {
                 setApplications(response.data);
                 setLoading(false);
             });
+
+        axios.get('http://localhost:8000/api/user', {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setUserName(response.data.name);
+            setCompanyName(response.data.company?.name || '');
+        });
     }, []);
 
     const getByStatus = (status) => {  // takes status and return only apps that match the status + search
@@ -82,6 +95,45 @@ function KanbanBoard() {
         );
     };
 
+    const openPanel = (app) => {
+        setSelectedApp(app);
+        setNewNote(''); // Clear note input
+        const token = localStorage.getItem('token');
+        axios.get(`http://localhost:8000/api/applications/${app.id}/notes`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setNotes(response.data);
+        });
+    };
+
+    const closePanel = () => {
+        setSelectedApp(null);
+        setNotes([]);
+        setNewNote('');
+    };
+
+    const addNote = () => {
+        if (!newNote.trim()) return;
+        const token = localStorage.getItem('token');
+        axios.post(`http://localhost:8000/api/applications/${selectedApp.id}/notes`, {
+            content: newNote,
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setNotes([response.data, ...notes]);
+            setNewNote('');
+        });
+    };
+
+    const deleteNote = (noteId) => {
+        const token = localStorage.getItem('token');
+        axios.delete(`http://localhost:8000/api/notes/${noteId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(() => {
+            setNotes(notes.filter(note => note.id !== noteId));
+        });
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -125,10 +177,10 @@ function KanbanBoard() {
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-gray-700">
-                            COMPANY NAME
+                            {companyName}
                         </span>
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                            A
+                            {userName.charAt(0).toUpperCase()}
                         </div>
                     </div>
                 </div>
@@ -498,11 +550,32 @@ function KanbanBoard() {
                                                                                 daysLabel
                                                                             }
                                                                         </span>
-                                                                        <span
-                                                                            className={`text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${app.status === "screening" ? "bg-blue-50 text-blue-600" : app.status === "interview" ? "bg-purple-50 text-purple-600" : app.status === "technical" ? "bg-amber-50 text-amber-600" : app.status === "hired" ? "bg-emerald-50 text-emerald-600" : app.status === "rejected" ? "bg-red-50 text-red-600" : s === "screening" ? "bg-blue-50 text-blue-600" : s === "interview" ? "bg-purple-50 text-purple-600" : s === "technical" ? "bg-amber-50 text-amber-600" : s === "hired" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
-                                                                        >
-                                                                            {app.status === "screening" ? "Screening" : app.status === "interview" ? "Interview" : app.status === "technical" ? "Technical" : app.status === "hired" ? "Hired" : app.status === "rejected" ? "Rejected" : s === "screening" ? "Screening" : s === "interview" ? "Interview" : s === "technical" ? "Technical" : s === "hired" ? "Hired" : "Rejected"}
-                                                                        </span>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span
+                                                                                className={`text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${app.status === "screening" ? "bg-blue-50 text-blue-600" : app.status === "interview" ? "bg-purple-50 text-purple-600" : app.status === "technical" ? "bg-amber-50 text-amber-600" : app.status === "hired" ? "bg-emerald-50 text-emerald-600" : app.status === "rejected" ? "bg-red-50 text-red-600" : s === "screening" ? "bg-blue-50 text-blue-600" : s === "interview" ? "bg-purple-50 text-purple-600" : s === "technical" ? "bg-amber-50 text-amber-600" : s === "hired" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
+                                                                            >
+                                                                                {app.status === "screening" ? "Screening" : app.status === "interview" ? "Interview" : app.status === "technical" ? "Technical" : app.status === "hired" ? "Hired" : app.status === "rejected" ? "Rejected" : s === "screening" ? "Screening" : s === "interview" ? "Interview" : s === "technical" ? "Technical" : s === "hired" ? "Hired" : "Rejected"}
+                                                                            </span>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={(e) => { e.stopPropagation(); openPanel(app); }}
+                                                                                className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                                                                            >
+                                                                                <svg
+                                                                                    width="14"
+                                                                                    height="14"
+                                                                                    viewBox="0 0 24 24"
+                                                                                    fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    strokeWidth="2"
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                >
+                                                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                                                    <circle cx="12" cy="12" r="3" />
+                                                                                </svg>
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -519,6 +592,161 @@ function KanbanBoard() {
                     </div>
                 </DragDropContext>
             </div>
+
+            {/* ─── Candidate Detail Side Panel ─── */}
+            {selectedApp && (
+                <div className="fixed inset-0 z-50 flex justify-end">
+                    <div
+                        className="fixed inset-0 bg-black/20"
+                        onClick={closePanel}
+                    />
+                    <div className="relative w-full max-w-md bg-white shadow-2xl border-l border-gray-200 overflow-y-auto">
+                        {/* Header */}
+                        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+                            <span className="text-lg font-bold text-gray-900">
+                                Candidate Details
+                            </span>
+                            <button
+                                type="button"
+                                onClick={closePanel}
+                                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center"
+                            >
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Candidate Info */}
+                        <div className="px-6 py-6">
+                            <div
+                                className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${selectedApp.status === "screening" ? "bg-gradient-to-br from-blue-400 to-blue-600" : selectedApp.status === "interview" ? "bg-gradient-to-br from-purple-400 to-purple-600" : selectedApp.status === "technical" ? "bg-gradient-to-br from-amber-400 to-amber-600" : selectedApp.status === "hired" ? "bg-gradient-to-br from-emerald-400 to-emerald-600" : "bg-gradient-to-br from-red-400 to-red-600"}`}
+                            >
+                                {selectedApp.candidate?.first_name?.[0]?.toUpperCase() || ""}
+                                {selectedApp.candidate?.last_name?.[0]?.toUpperCase() || ""}
+                            </div>
+                            <div className="text-xl font-bold text-gray-900 mt-4">
+                                {selectedApp.candidate?.first_name} {selectedApp.candidate?.last_name}
+                            </div>
+                            <div className="text-sm text-gray-500 mt-1">
+                                {selectedApp.candidate?.email}
+                            </div>
+                            {selectedApp.candidate?.phone && (
+                                <div className="text-sm text-gray-400 mt-0.5">
+                                    {selectedApp.candidate.phone}
+                                </div>
+                            )}
+                            <div className="mt-3">
+                                <span
+                                    className={`text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${selectedApp.status === "screening" ? "bg-blue-50 text-blue-600" : selectedApp.status === "interview" ? "bg-purple-50 text-purple-600" : selectedApp.status === "technical" ? "bg-amber-50 text-amber-600" : selectedApp.status === "hired" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
+                                >
+                                    {selectedApp.status === "screening" ? "Screening" : selectedApp.status === "interview" ? "Interview" : selectedApp.status === "technical" ? "Technical" : selectedApp.status === "hired" ? "Hired" : "Rejected"}
+                                </span>
+                            </div>
+                            {selectedApp.candidate?.resume_path && (
+                                <a
+                                    href={`http://localhost:8000/storage/${selectedApp.candidate.resume_path}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                                    Download Resume
+                                </a>
+                            )}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="border-t border-gray-100 mx-6" />
+
+                        {/* Notes Section */}
+                        <div className="px-6 py-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-sm font-bold text-gray-900">
+                                    Notes
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                    {notes.length} notes
+                                </span>
+                            </div>
+
+                            {/* Add note */}
+                            <div className="mb-6">
+                                <textarea
+                                    value={newNote}
+                                    onChange={(e) => setNewNote(e.target.value)}
+                                    placeholder="Add a note about this candidate..."
+                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 h-20"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={addNote}
+                                    className="mt-2 px-4 py-2 bg-black text-white text-xs font-semibold rounded-lg hover:bg-gray-800 transition-colors"
+                                >
+                                    Add Note
+                                </button>
+                            </div>
+
+                            {/* Notes list */}
+                            {notes.length === 0 ? (
+                                <div className="text-sm text-gray-300 text-center py-8">
+                                    No notes yet. Be the first to add one.
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {notes.map((note) => (
+                                        <div
+                                            key={note.id}
+                                            className="group bg-gray-50 rounded-xl p-4"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-semibold text-gray-700">
+                                                    {note.user?.name || "Recruiter"}
+                                                </span>
+                                                <span className="text-[10px] text-gray-300">
+                                                    {new Date(note.created_at).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-600 mt-2 leading-relaxed">
+                                                {note.content}
+                                            </div>
+                                            <div
+                                                onClick={() => deleteNote(note.id)}
+                                                className="mt-2 text-[10px] text-red-400 hover:text-red-600 cursor-pointer opacity-0 group-hover:opacity-100"
+                                            >
+                                                Delete
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
