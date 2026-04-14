@@ -33,4 +33,9 @@ class JobOffer extends Model
     {
         return $this->belongsToMany(Tag::class, 'job_offer_tag');
     }
+
+    public function scopeForCompany($query, int $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
 }

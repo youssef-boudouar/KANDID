@@ -12,7 +12,7 @@ class JobOfferController extends Controller
 {
     public function index(Request $request)
     {
-        $jobOffers = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)->get();
+        $jobOffers = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->get();
 
         return JobOfferResource::collection($jobOffers);
     }
@@ -31,15 +31,14 @@ class JobOfferController extends Controller
 
     public function show(Request $request, $id)
     {
-        $jobOffer = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)->findOrFail($id);
+        $jobOffer = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->findOrFail($id);
 
         return new JobOfferResource($jobOffer);
     }
 
     public function update(UpdateJobOfferRequest $request, $id)
     {
-        $jobOffer = JobOffer::where('company_id', $request->user()->company_id)
-            ->findOrFail($id);
+        $jobOffer = JobOffer::forCompany($request->user()->company_id)->findOrFail($id);
 
         $validated = $request->validated();
 
@@ -50,8 +49,7 @@ class JobOfferController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $jobOffer = JobOffer::where('company_id', $request->user()->company_id)
-            ->findOrFail($id);
+        $jobOffer = JobOffer::forCompany($request->user()->company_id)->findOrFail($id);
 
         $jobOffer->delete();
 
