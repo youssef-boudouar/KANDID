@@ -230,14 +230,7 @@ function Register() {
                             {loading ? 'Creating account...' : 'Create account'}
                         </button>
 
-                        {/* Guest */}
-                        <button
-                            type="button"
-                            onClick={() => window.location.href = '/jobs'}
-                            className="w-full py-4 bg-white border-2 border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors mt-3"
-                        >
-                            Browse Jobs as Guest
-                        </button>
+
                     </form>
 
                     {/* Bottom link */}
