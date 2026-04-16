@@ -10,6 +10,14 @@ import PublicJobs from './pages/PublicJobs';
 import PublicJobApply from './pages/PublicJobApply';
 
 
+function ProtectedRoute({ children }) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return <Navigate to="/login" />;
+    }
+    return children;
+}
+
 function App() {
     return (
         <BrowserRouter>
@@ -22,11 +30,11 @@ function App() {
 
                 {/* Recruiter only routes */}
                 {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-                <Route path="/job-offers" element={<JobOffers />} />
-                <Route path="/job-offers/create" element={<CreateJob />} />
-                <Route path="/job-offers/:id" element={<JobDetails />} />
-                <Route path="/job-offers/:id/edit" element={<EditJob />} />
-                <Route path="/job-offers/:id/pipeline" element={<KanbanBoard />} />
+                <Route path="/job-offers" element={<ProtectedRoute><JobOffers /></ProtectedRoute>} />
+                <Route path="/job-offers/create" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
+                <Route path="/job-offers/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
+                <Route path="/job-offers/:id/edit" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
+                <Route path="/job-offers/:id/pipeline" element={<ProtectedRoute><KanbanBoard /></ProtectedRoute>} />
 
                 {/* Unknown URL*/}
                 <Route path="*" element={<Navigate to="/login" />} />
