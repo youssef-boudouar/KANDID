@@ -81,9 +81,6 @@ function PublicJobApply() {
                         </svg>
                     </button>
 
-                    <p className="text-xs text-gray-300 mt-12">
-                        A confirmation has been sent to your email address
-                    </p>
                 </div>
             </div>
         );
