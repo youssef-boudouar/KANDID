@@ -81,6 +81,15 @@ function EditJob() {
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
                             {userName.charAt(0).toUpperCase()}
                         </div>
+                        <button
+                            onClick={() => {
+                                localStorage.removeItem('token');
+                                window.location.href = '/login';
+                            }}
+                            className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium ml-2"
+                        >
+                            Logout
+                        </button>
                     </div>
                 </div>
             </nav>
