@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function KanbanBoard() {
     const status = ["screening", "interview", "technical", "hired", "rejected"];
-    
+
     const [applications, setApplications] = useState([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
@@ -17,6 +17,7 @@ function KanbanBoard() {
     const [newNote, setNewNote] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [userName, setUserName] = useState('');
+    const [currentUserId, setCurrentUserId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,6 +44,7 @@ function KanbanBoard() {
         }).then(response => {
             setUserName(response.data.name);
             setCompanyName(response.data.company?.name || '');
+            setCurrentUserId(response.data.id);
         });
     }, []);
 
@@ -739,15 +741,17 @@ function KanbanBoard() {
                                                     {new Date(note.created_at).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <div className="text-sm text-gray-600 mt-2 leading-relaxed">
+                                            <div className="text-sm text-gray-600 mt-2 leading-relaxed break-words">
                                                 {note.content}
                                             </div>
-                                            <div
-                                                onClick={() => deleteNote(note.id)}
-                                                className="mt-2 text-[10px] text-red-400 hover:text-red-600 cursor-pointer opacity-0 group-hover:opacity-100"
-                                            >
-                                                Delete
-                                            </div>
+                                            {note.user_id === currentUserId && (
+                                                <div
+                                                    onClick={() => deleteNote(note.id)}
+                                                    className="mt-2 text-[10px] text-red-400 hover:text-red-600 cursor-pointer opacity-0 group-hover:opacity-100"
+                                                >
+                                                    Delete
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
