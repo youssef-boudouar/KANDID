@@ -12,6 +12,8 @@ function EditJob() {
     const [loading, setLoading] = useState(true);
     const [companyName, setCompanyName] = useState('');
     const [userName, setUserName] = useState('');
+    const [showInvite, setShowInvite] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -80,6 +82,48 @@ function EditJob() {
                         <span className="text-sm font-semibold text-gray-700">{companyName}</span>
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
                             {userName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="relative">
+                            {showInvite && <div className="fixed inset-0 z-40" onClick={() => setShowInvite(false)} />}
+                            <button
+                                onClick={() => setShowInvite(!showInvite)}
+                                className="text-xs text-gray-500 hover:text-black transition-colors font-medium"
+                            >
+                                + Invite
+                            </button>
+
+                            {showInvite && (
+                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-72 z-50">
+                                    <p className="text-sm font-bold text-gray-900 mb-3">Invite Team Member</p>
+                                    <input
+                                        type="email"
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                        placeholder="colleague@company.com"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 mb-3"
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            if (!inviteEmail) return;
+                                            const token = localStorage.getItem('token');
+                                            axios.post('http://localhost:8000/api/team/invite', {
+                                                email: inviteEmail,
+                                            }, {
+                                                headers: { Authorization: `Bearer ${token}` }
+                                            }).then(() => {
+                                                alert('Invitation sent!');
+                                                setInviteEmail('');
+                                                setShowInvite(false);
+                                            }).catch(() => {
+                                                alert('Failed to send invitation');
+                                            });
+                                        }}
+                                        className="w-full py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors"
+                                    >
+                                        Send Invite
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <button
                             onClick={() => {
