@@ -33,8 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 
     Route::get('/applications/{applicationId}/notes', [NoteController::class, 'index']);
-Route::post('/applications/{applicationId}/notes', [NoteController::class, 'store']);
-Route::delete('/notes/{id}', [NoteController::class, 'destroy']);
+    Route::post('/applications/{applicationId}/notes', [NoteController::class, 'store']);
+    Route::delete('/notes/{id}', [NoteController::class, 'destroy']);
+
+
+    Route::post('/team/invite', [AuthController::class, 'invite']);
 });
 
 Route::get('/public/jobs', [PublicJobController::class, 'index']);
