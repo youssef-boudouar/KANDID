@@ -12,6 +12,9 @@ function Register() {
     const [loading, setLoading] = useState(false);
     const [focused, setFocused] = useState('');
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const inviteToken = urlParams.get('token');
+
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -25,6 +28,7 @@ function Register() {
                 email,
                 password,
                 password_confirmation: passwordConfirmation,
+                invite_token: inviteToken,
             });
 
             localStorage.setItem('token', response.data.token);
@@ -84,9 +88,9 @@ function Register() {
                 <div className="max-w-md w-full">
 
                     {/* Header */}
-                    <h2 className="text-3xl font-extrabold text-gray-900">Create your account</h2>
+                    <h2 className="text-3xl font-extrabold text-gray-900">{inviteToken ? 'Join your team' : 'Create your account'}</h2>
                     <p className="text-sm text-gray-400 mt-2 mb-8">
-                        Start your journey with the KANDID recruitment platform.
+                        {inviteToken ? "You've been invited to join a team on KANDID." : 'Start your journey with the KANDID recruitment platform.'}
                     </p>
 
                     {/* Error */}
@@ -100,6 +104,7 @@ function Register() {
                     <form onSubmit={handleRegister} className="space-y-5">
 
                         {/* Row 1 — Company Name + Domain */}
+                        {!inviteToken && (
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-[11px] uppercase tracking-widest text-gray-400 font-semibold mb-2">
@@ -141,6 +146,7 @@ function Register() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         {/* Row 2 — Full Name */}
                         <div>
