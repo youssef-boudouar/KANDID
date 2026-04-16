@@ -38,6 +38,8 @@ class NoteController extends Controller
             'content' => $validated['content'],
         ]);
 
+        $note->load('user:id,name');
+
         return response()->json($note, 201);
     }
 
