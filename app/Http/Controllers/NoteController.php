@@ -49,9 +49,12 @@ class NoteController extends Controller
             $query->where('company_id', $request->user()->company_id);
         })->findOrFail($id);
 
+        if ($note->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'You can only delete your own notes'], 403);
+        }
+
         $note->delete();
 
         return response()->json(['message' => 'Note deleted']);
     }
-
 }
