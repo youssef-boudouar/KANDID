@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PublicJobController;
@@ -38,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::post('/team/invite', [AuthController::class, 'invite']);
+
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
 Route::get('/public/jobs', [PublicJobController::class, 'index']);
