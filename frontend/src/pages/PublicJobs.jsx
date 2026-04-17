@@ -34,7 +34,6 @@ function PublicJobs() {
                     </span>
 
                     <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium">
-                        <a href="/jobs" className="hover:text-[#0a0a0a] transition-colors">Home</a>
                         <a href="/jobs" className="text-[#0a0a0a] font-semibold border-b-2 border-[#0a0a0a] pb-0.5">Browse Jobs</a>
                     </div>
 
