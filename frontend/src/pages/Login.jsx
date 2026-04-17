@@ -19,7 +19,7 @@ function Login() {
             });
 
             localStorage.setItem('token', response.data.token);
-            window.location.href = '/job-offers';
+            window.location.href = '/dashboard';
         } catch (err) {
             setError('Invalid email or password');
         } finally {
