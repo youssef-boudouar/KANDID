@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ApplicationService;
 use App\Http\Requests\MoveApplicationRequest;
+use App\Http\Resources\ApplicationResource;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
@@ -14,7 +15,7 @@ class ApplicationController extends Controller
     {
         $applications = $this->applicationService->getApplicationsForJob($jobOfferId, $request->user()->company_id);
 
-        return response()->json($applications);
+        return ApplicationResource::collection($applications);
     }
 
     public function show(Request $request, $id)
@@ -25,7 +26,7 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json($application);
+        return new ApplicationResource($application);
     }
 
     public function move(MoveApplicationRequest $request, $id)
@@ -38,7 +39,7 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json($application);
+        return new ApplicationResource($application);
     }
 
     public function destroy(Request $request, $id)

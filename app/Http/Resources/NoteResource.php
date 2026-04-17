@@ -9,7 +9,6 @@ class NoteResource extends JsonResource
         return [
             'id'             => $this->id,
             'content'        => $this->content,
-            'user_id'        => $this->user_id,
             'application_id' => $this->application_id,
             'user'           => $this->whenLoaded('user', fn() => [
                 'id'   => $this->user->id,
