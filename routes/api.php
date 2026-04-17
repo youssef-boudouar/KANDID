@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PublicJobController;
+use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +43,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/team/invite', [AuthController::class, 'invite']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+
+    Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
+    Route::get('/admin/stats', [AdminController::class, 'stats']);
+    Route::get('/admin/companies', [AdminController::class, 'companies']);
+    Route::get('/admin/users', [AdminController::class, 'users']);
+    Route::delete('/admin/companies/{id}', [AdminController::class, 'deleteCompany']);
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
+});
 });
 
 Route::get('/public/jobs', [PublicJobController::class, 'index']);
