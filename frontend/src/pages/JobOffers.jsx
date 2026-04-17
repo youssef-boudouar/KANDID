@@ -53,11 +53,7 @@ function JobOffers() {
                             KAND<span className="text-black">ID</span>
                         </span>
                         <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                            <span className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
                             <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Applications</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Candidates</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Settings</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -162,11 +158,6 @@ function JobOffers() {
                         <option value="draft">Draft</option>
                         <option value="archived">Archived</option>
                     </select>
-                    <button className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                            <path d="M4 6h16M7 12h10M10 18h4"/>
-                        </svg>
-                    </button>
                 </div>
 
                 {/* Job Cards Grid */}
@@ -202,19 +193,12 @@ function JobOffers() {
                                 {/* Card Body */}
                                 <div className="p-6">
 
-                                    {/* Row 1 — Status + Menu */}
+                                    {/* Row 1 — Status */}
                                     <div className="flex justify-between items-center">
                                         <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${status.text}`}>
                                             <span className={`w-2 h-2 rounded-full ${status.dot}`} />
                                             {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                                         </span>
-                                        <button className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-gray-100 rounded-lg transition-all text-gray-400 hover:text-gray-600">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                <circle cx="12" cy="5" r="2"/>
-                                                <circle cx="12" cy="12" r="2"/>
-                                                <circle cx="12" cy="19" r="2"/>
-                                            </svg>
-                                        </button>
                                     </div>
 
                                     {/* Row 2 — Title */}
@@ -236,7 +220,7 @@ function JobOffers() {
                                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                             </svg>
-                                            0 Applications
+                                            {job.applications_count || 0} Applications
                                         </span>
                                         <span className="px-2.5 py-1 bg-gray-50 rounded-lg text-[11px] font-medium text-gray-500 flex items-center gap-1.5">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -260,9 +244,9 @@ function JobOffers() {
                                     <div className="pt-4 flex justify-between items-center">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                                                T
+                                                {companyName.charAt(0)}
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-700">TechCorp</span>
+                                            <span className="text-sm font-semibold text-gray-700">{companyName}</span>
                                         </div>
                                         <span className="text-xs font-medium text-gray-400 group-hover:text-black flex items-center gap-1 transition-all">
                                             View details

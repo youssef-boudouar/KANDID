@@ -70,11 +70,7 @@ function JobDetails() {
                             KAND<span className="text-black">ID</span>
                         </span>
                         <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                            <span className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
                             <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Applications</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Candidates</span>
-                            <span className="cursor-pointer hover:text-black transition-colors">Settings</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -211,7 +207,7 @@ function JobDetails() {
                                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">
                                     Applications
                                 </label>
-                                <span className="text-2xl font-extrabold text-gray-900">0</span>
+                                <span className="text-2xl font-extrabold text-gray-900">{job.applications_count || 0}</span>
                             </div>
                             <div className="bg-gray-50 rounded-xl p-5">
                                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">
