@@ -9,6 +9,7 @@ import KanbanBoard from './pages/KanbanBoard';
 import PublicJobs from './pages/PublicJobs';
 import PublicJobApply from './pages/PublicJobApply';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 function ProtectedRoute({ children }) {
@@ -36,6 +37,9 @@ function App() {
                 <Route path="/job-offers/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
                 <Route path="/job-offers/:id/edit" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
                 <Route path="/job-offers/:id/pipeline" element={<ProtectedRoute><KanbanBoard /></ProtectedRoute>} />
+
+                {/* Admin only */}
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
                 {/* Unknown URL*/}
                 <Route path="*" element={<Navigate to="/login" />} />

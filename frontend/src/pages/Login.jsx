@@ -19,7 +19,11 @@ function Login() {
             });
 
             localStorage.setItem('token', response.data.token);
-            window.location.href = '/dashboard';
+            if (response.data.user.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/dashboard';
+            }
         } catch (err) {
             setError('Invalid email or password');
         } finally {
