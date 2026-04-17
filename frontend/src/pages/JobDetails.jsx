@@ -70,6 +70,7 @@ function JobDetails() {
                             KAND<span className="text-black">ID</span>
                         </span>
                         <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
+                            <span onClick={() => navigate('/dashboard')} className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
                             <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
                         </div>
                     </div>

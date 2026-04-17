@@ -160,6 +160,12 @@ function KanbanBoard() {
                         </span>
                         <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
                             <span
+                                onClick={() => navigate('/dashboard')}
+                                className="cursor-pointer hover:text-black transition-colors"
+                            >
+                                Dashboard
+                            </span>
+                            <span
                                 onClick={() => navigate("/job-offers")}
                                 className="cursor-pointer hover:text-black transition-colors"
                             >
