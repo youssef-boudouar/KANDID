@@ -9,7 +9,7 @@ class JobOfferController extends Controller
 {
     public function index(Request $request)
     {
-        $jobOffers = JobOffer::where('company_id', $request->user()->company_id)->get();
+        $jobOffers = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)->get();
 
         return response()->json($jobOffers);
     }
@@ -32,7 +32,7 @@ class JobOfferController extends Controller
 
     public function show(Request $request, $id)
     {
-        $jobOffer = JobOffer::where('company_id', $request->user()->company_id)
+        $jobOffer = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)
             ->findOrFail($id);
 
         return response()->json($jobOffer);
