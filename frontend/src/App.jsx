@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import KanbanBoard from './pages/KanbanBoard';
 import PublicJobs from './pages/PublicJobs';
 import PublicJobApply from './pages/PublicJobApply';
+import Dashboard from './pages/Dashboard';
 
 
 function ProtectedRoute({ children }) {
@@ -29,7 +30,7 @@ function App() {
                 <Route path="/jobs/:id" element={<PublicJobApply />} />
 
                 {/* Recruiter only routes */}
-                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/job-offers" element={<ProtectedRoute><JobOffers /></ProtectedRoute>} />
                 <Route path="/job-offers/create" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
                 <Route path="/job-offers/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
