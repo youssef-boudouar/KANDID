@@ -36,7 +36,6 @@ function PublicJobs() {
                     <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium">
                         <a href="/jobs" className="hover:text-[#0a0a0a] transition-colors">Home</a>
                         <a href="/jobs" className="text-[#0a0a0a] font-semibold border-b-2 border-[#0a0a0a] pb-0.5">Browse Jobs</a>
-                        <a href="#" className="hover:text-[#0a0a0a] transition-colors">How it Works</a>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -80,13 +79,8 @@ function PublicJobs() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search by job title, keyword, or company..."
-                                className="flex-1 py-3 px-2 text-sm text-[#0a0a0a] placeholder-gray-400 bg-transparent focus:outline-none"
+                                className="flex-1 py-3 px-2 pr-5 text-sm text-[#0a0a0a] placeholder-gray-400 bg-transparent focus:outline-none"
                             />
-                            <button
-                                className="bg-[#0a0a0a] text-white text-sm font-semibold px-6 py-2.5 rounded-full mr-1 hover:bg-gray-800 transition-colors flex-shrink-0"
-                            >
-                                Search
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -158,9 +152,6 @@ function PublicJobs() {
                                     <div className="flex items-center gap-2 mt-3 flex-wrap">
                                         <span className="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wide font-medium px-2.5 py-0.5 rounded-full">
                                             {new Date(job.created_at).toLocaleDateString()}
-                                        </span>
-                                        <span className="bg-blue-50 text-blue-600 text-[10px] uppercase tracking-wide font-semibold px-2.5 py-0.5 rounded-full">
-                                            Full Time
                                         </span>
                                     </div>
                                 </div>

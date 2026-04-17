@@ -102,7 +102,6 @@ function PublicJobApply() {
                     <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium">
                         <a href="/jobs" className="hover:text-[#0a0a0a] transition-colors">Home</a>
                         <a href="/jobs" className="text-[#0a0a0a] font-semibold border-b-2 border-[#0a0a0a] pb-0.5">Browse Jobs</a>
-                        <a href="#" className="hover:text-[#0a0a0a] transition-colors">How it Works</a>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -189,29 +188,18 @@ function PublicJobApply() {
                                 <span className="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wide font-medium px-2.5 py-0.5 rounded-full">
                                     Posted {new Date(job.created_at).toLocaleDateString()}
                                 </span>
-                                {job.tags && job.tags.length > 0 ? (
-                                    job.tags.map((tag) => (
-                                        <span
-                                            key={tag.id}
-                                            className="text-[10px] uppercase tracking-wide font-semibold px-2.5 py-0.5 rounded-full"
-                                            style={{
-                                                backgroundColor: tag.color ? `${tag.color}15` : 'rgb(239 246 255)',
-                                                color: tag.color || '#2563eb',
-                                            }}
-                                        >
-                                            {tag.name}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <>
-                                        <span className="bg-blue-50 text-blue-600 text-[10px] uppercase tracking-wide font-semibold px-2.5 py-0.5 rounded-full">
-                                            Full Time
-                                        </span>
-                                        <span className="bg-gray-100 text-gray-500 text-[10px] uppercase tracking-wide font-medium px-2.5 py-0.5 rounded-full">
-                                            Remote
-                                        </span>
-                                    </>
-                                )}
+                                {job.tags && job.tags.length > 0 && job.tags.map((tag) => (
+                                    <span
+                                        key={tag.id}
+                                        className="text-[10px] uppercase tracking-wide font-semibold px-2.5 py-0.5 rounded-full"
+                                        style={{
+                                            backgroundColor: tag.color ? `${tag.color}15` : 'rgb(239 246 255)',
+                                            color: tag.color || '#2563eb',
+                                        }}
+                                    >
+                                        {tag.name}
+                                    </span>
+                                ))}
                             </div>
 
                             {/* Divider */}
