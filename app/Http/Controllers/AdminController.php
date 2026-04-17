@@ -47,6 +47,11 @@ class AdminController extends Controller
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);
+
+        if($user->role === 'admin')
+        {
+            return response()->json(['message' => 'cannot delete admin'], 403);
+        }
         $user->delete();
         return response()->json(['message' => 'User deleted']);
     }
