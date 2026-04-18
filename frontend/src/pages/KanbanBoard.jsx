@@ -151,30 +151,28 @@ function KanbanBoard() {
             {/* ─── Navbar ─── */}
             <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
                 <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    <div className="flex items-center gap-10">
+                    <span
+                        className="text-xl font-extrabold tracking-tight text-gray-900 cursor-pointer"
+                        onClick={() => navigate("/job-offers")}
+                    >
+                        KAND<span className="text-black">ID</span>
+                    </span>
+                    <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
                         <span
-                            className="text-xl font-extrabold tracking-tight text-gray-900 cursor-pointer"
-                            onClick={() => navigate("/job-offers")}
+                            onClick={() => navigate('/dashboard')}
+                            className="cursor-pointer hover:text-black transition-colors"
                         >
-                            KAND<span className="text-black">ID</span>
+                            Dashboard
                         </span>
-                        <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                            <span
-                                onClick={() => navigate('/dashboard')}
-                                className="cursor-pointer hover:text-black transition-colors"
-                            >
-                                Dashboard
-                            </span>
-                            <span
-                                onClick={() => navigate("/job-offers")}
-                                className="cursor-pointer hover:text-black transition-colors"
-                            >
-                                Job Offers
-                            </span>
-                            <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">
-                                Pipeline
-                            </span>
-                        </div>
+                        <span
+                            onClick={() => navigate("/job-offers")}
+                            className="cursor-pointer hover:text-black transition-colors"
+                        >
+                            Job Offers
+                        </span>
+                        <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">
+                            Pipeline
+                        </span>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-gray-700">

@@ -65,14 +65,12 @@ function JobDetails() {
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
                 <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    <div className="flex items-center gap-10">
-                        <span className="text-xl font-extrabold tracking-tight text-gray-900">
-                            KAND<span className="text-black">ID</span>
-                        </span>
-                        <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                            <span onClick={() => navigate('/dashboard')} className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
-                            <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
-                        </div>
+                    <span className="text-xl font-extrabold tracking-tight text-gray-900">
+                        KAND<span className="text-black">ID</span>
+                    </span>
+                    <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
+                        <span onClick={() => navigate('/dashboard')} className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
+                        <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-gray-700">{companyName}</span>
