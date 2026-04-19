@@ -62,34 +62,62 @@ function KanbanBoard() {
     };
 
     const onDragEnd = (result) => {
-        if (!result.destination) return; // dropped out of droppable zones
+        if (!result.destination) return;
+        const { source, destination, draggableId } = result;
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-        if (
-            // dropped to the same original place
-            result.source.droppableId === result.destination.droppableId &&
-            result.source.index === result.destination.index
-        )
-            return;
+        const draggedId = parseInt(draggableId);
 
-        const updatedApplications = applications.map((app) => {
-            if (app.id === parseInt(result.draggableId)) {
-                // checking which card was dragged
-                app.status = result.destination.droppableId;
-                app.kanban_order = result.destination.index;
-            }
-            return app;
-        });
+        const sourceColApps = applications
+            .filter(a => a.status === source.droppableId)
+            .sort((a, b) => a.kanban_order - b.kanban_order);
 
-        setApplications(updatedApplications);
+        const [moved] = sourceColApps.splice(source.index, 1);
 
-        // update dragged item on backend
-        api.put(
-            `/applications/${result.draggableId}/move`,
-            {
-                status: result.destination.droppableId,
-                kanban_order: result.destination.index,
-            },
+        let allUpdates;
+
+        if (source.droppableId === destination.droppableId) {
+            // Same column reorder
+            sourceColApps.splice(destination.index, 0, moved);
+            allUpdates = sourceColApps.map((app, i) => ({
+                id: app.id,
+                status: app.status,
+                kanban_order: i,
+            }));
+        } else {
+            // Cross-column move
+            const destColApps = applications
+                .filter(a => a.status === destination.droppableId && a.id !== draggedId)
+                .sort((a, b) => a.kanban_order - b.kanban_order);
+
+            const movedWithNewStatus = { ...moved, status: destination.droppableId };
+            destColApps.splice(destination.index, 0, movedWithNewStatus);
+
+            const srcUpdates = sourceColApps.map((app, i) => ({
+                id: app.id,
+                status: app.status,
+                kanban_order: i,
+            }));
+            const dstUpdates = destColApps.map((app, i) => ({
+                id: app.id,
+                status: destination.droppableId,
+                kanban_order: i,
+            }));
+            allUpdates = [...srcUpdates, ...dstUpdates];
+        }
+
+        // Optimistic UI update
+        setApplications(prev =>
+            prev.map(a => {
+                const u = allUpdates.find(u => u.id === a.id);
+                return u ? { ...a, status: u.status, kanban_order: u.kanban_order } : a;
+            })
         );
+
+        // Persist to backend, rollback on error
+        api.put('/applications/reorder', { applications: allUpdates }).catch(() => {
+            api.get(`/job-offers/${id}/applications`).then(r => setApplications(r.data));
+        });
     };
 
     const openPanel = (app) => {

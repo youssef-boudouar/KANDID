@@ -42,6 +42,29 @@ class ApplicationController extends Controller
         return new ApplicationResource($application);
     }
 
+    public function reorder(Request $request)
+    {
+        $validated = $request->validate([
+            'applications'                => 'required|array',
+            'applications.*.id'           => 'required|integer',
+            'applications.*.status'       => 'required|string|in:screening,interview,technical,hired,rejected',
+            'applications.*.kanban_order' => 'required|integer|min:0',
+        ]);
+
+        foreach ($validated['applications'] as $item) {
+            $application = $this->applicationService->moveApplication(
+                $item['id'],
+                $request->user()->company_id,
+                ['status' => $item['status'], 'kanban_order' => $item['kanban_order']]
+            );
+            if (!$application) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+        }
+
+        return response()->json(['message' => 'Reordered']);
+    }
+
     public function destroy(Request $request, $id)
     {
         $deleted = $this->applicationService->deleteApplication($id, $request->user()->company_id);
