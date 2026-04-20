@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\Route;
 
 
 // Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -59,4 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/public/jobs', [PublicJobController::class, 'index']);
 Route::get('/public/jobs/{id}', [PublicJobController::class, 'show']);
-Route::post('/public/jobs/{id}/apply', [PublicJobController::class, 'apply']);
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/public/jobs/{id}/apply', [PublicJobController::class, 'apply']);
+});
