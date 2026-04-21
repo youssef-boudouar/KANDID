@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invitation extends Model
 {
-    protected $fillable = ['company_id', 'email', 'token'];
+    protected $fillable = ['company_id', 'email', 'token', 'expires_at'];
+
+    protected $casts = [
+        'expires_at' => 'datetime',
+    ];
 
     public function company()
     {
