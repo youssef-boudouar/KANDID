@@ -6,6 +6,7 @@ use App\Services\ApplicationService;
 use App\Http\Requests\MoveApplicationRequest;
 use App\Http\Resources\ApplicationResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApplicationController extends Controller
 {
@@ -45,22 +46,24 @@ class ApplicationController extends Controller
     public function reorder(Request $request)
     {
         $validated = $request->validate([
-            'applications'                => 'required|array',
+            'applications'                => 'required|array|max:100',
             'applications.*.id'           => 'required|integer',
             'applications.*.status'       => 'required|string|in:screening,interview,technical,hired,rejected',
             'applications.*.kanban_order' => 'required|integer|min:0',
         ]);
 
-        foreach ($validated['applications'] as $item) {
-            $application = $this->applicationService->moveApplication(
-                $item['id'],
-                $request->user()->company_id,
-                ['status' => $item['status'], 'kanban_order' => $item['kanban_order']]
-            );
-            if (!$application) {
-                return response()->json(['message' => 'Forbidden'], 403);
+        DB::transaction(function () use ($validated, $request) {
+            foreach ($validated['applications'] as $item) {
+                $application = $this->applicationService->moveApplication(
+                    $item['id'],
+                    $request->user()->company_id,
+                    ['status' => $item['status'], 'kanban_order' => $item['kanban_order']]
+                );
+                if (!$application) {
+                    abort(403, 'Forbidden');
+                }
             }
-        }
+        });
 
         return response()->json(['message' => 'Reordered']);
     }

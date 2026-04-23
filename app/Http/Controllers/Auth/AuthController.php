@@ -22,6 +22,7 @@ class AuthController extends Controller
             }
 
             if ($invitation->expires_at && $invitation->expires_at->isPast()) {
+                $invitation->delete();
                 return response()->json(['message' => 'This invite link has expired'], 400);
             }
 

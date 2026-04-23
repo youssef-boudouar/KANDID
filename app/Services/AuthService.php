@@ -80,7 +80,7 @@ class AuthService
             'expires_at' => now()->addHours(48),
         ]);
 
-        $link = 'http://localhost:5173/register?token=' . $token;
+        $link = env('FRONTEND_URL', 'http://localhost:5173') . '/register?token=' . $token;
 
         Mail::raw("You're invited to join {$companyName} on KANDID! Click here: {$link}", function ($msg) use ($email, $companyName) {
             $msg->to($email);
