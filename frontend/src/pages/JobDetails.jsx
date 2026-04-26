@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
+import { useToast, ToastContainer } from '../components/Toast';
 
 function JobDetails() {
     const { id } = useParams();
@@ -9,6 +10,7 @@ function JobDetails() {
     const [job, setJob] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
         api.get(`/job-offers/${id}`).then(response => {
@@ -23,9 +25,11 @@ function JobDetails() {
     const handleDelete = () => {
         if (!window.confirm('Are you sure you want to delete this job offer?')) return; // cancel
         api.delete(`/job-offers/${id}`).then(() => {
+            showToast('Job offer deleted successfully');
             navigate('/job-offers');
         }).catch(() => {
             setError('Failed to delete job offer');
+            showToast('Failed to delete job offer', 'error');
         });
     };
 
@@ -45,6 +49,7 @@ function JobDetails() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            <ToastContainer toasts={toasts} />
             <RecruiterNavbar activePage="job-offers" />
 
             {/* Content */}

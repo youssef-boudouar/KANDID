@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
+import { useToast, ToastContainer } from '../components/Toast';
 
 function EditJob() {
     const { id } = useParams();
@@ -11,6 +12,7 @@ function EditJob() {
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
         api.get(`/job-offers/${id}`).then(response => {
@@ -27,10 +29,12 @@ function EditJob() {
     const handleSubmit = () => {
         api.put(`/job-offers/${id}`, { title, description, status })
         .then(() => {
+            showToast('Job offer updated successfully');
             navigate('/job-offers');
         })
         .catch(() => {
             setError('Failed to update job offer');
+            showToast('Failed to update job offer', 'error');
         });
     };
 
@@ -46,6 +50,7 @@ function EditJob() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            <ToastContainer toasts={toasts} />
             <RecruiterNavbar activePage="job-offers" />
 
             {/* Content Area */}

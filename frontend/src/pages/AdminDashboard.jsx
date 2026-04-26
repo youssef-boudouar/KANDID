@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from '../context/AuthContext';
+import { useToast, ToastContainer } from '../components/Toast';
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -10,6 +11,7 @@ function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { logout } = useAuth();
+    const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
         api.get("/admin/stats")
@@ -35,6 +37,10 @@ function AdminDashboard() {
             .delete(`/admin/companies/${id}`)
             .then(() => {
                 setCompanies(companies.filter((c) => c.id !== id));
+                showToast("Company deleted successfully");
+            })
+            .catch(() => {
+                showToast("Failed to delete company", "error");
             });
     };
 
@@ -44,11 +50,16 @@ function AdminDashboard() {
             .delete(`/admin/users/${id}`)
             .then(() => {
                 setUsers(users.filter((u) => u.id !== id));
+                showToast("User deleted successfully");
+            })
+            .catch(() => {
+                showToast("Failed to delete user", "error");
             });
     };
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            <ToastContainer toasts={toasts} />
             {/* Admin Navigation */}
             <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
                 <div className="flex items-center justify-between max-w-7xl mx-auto">

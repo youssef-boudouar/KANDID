@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import RecruiterNavbar from "../components/RecruiterNavbar";
+import { useToast, ToastContainer } from "../components/Toast";
 
 const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api$/, '');
 
@@ -20,6 +21,7 @@ function KanbanBoard() {
     const [newNote, setNewNote] = useState("");
     const [currentUserId, setCurrentUserId] = useState(null);
     const navigate = useNavigate();
+    const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
         api.get(`/job-offers/${id}`)
@@ -146,6 +148,10 @@ function KanbanBoard() {
             .then((response) => {
                 setNotes([response.data, ...notes]); //add new note to top of the list
                 setNewNote("");
+                showToast("Note added successfully");
+            })
+            .catch(() => {
+                showToast("Failed to add note", "error");
             });
     };
 
@@ -154,6 +160,10 @@ function KanbanBoard() {
             .delete(`/notes/${noteId}`)
             .then(() => {
                 setNotes(notes.filter((note) => note.id !== noteId));
+                showToast("Note deleted successfully");
+            })
+            .catch(() => {
+                showToast("Failed to delete note", "error");
             });
     };
 
@@ -167,6 +177,7 @@ function KanbanBoard() {
 
     return (
         <div className="min-h-screen bg-gray-100 overflow-hidden">
+            <ToastContainer toasts={toasts} />
             <RecruiterNavbar activePage="pipeline" />
 
             {/* ─── Header ─── */}

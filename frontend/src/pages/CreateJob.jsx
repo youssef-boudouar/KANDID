@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
+import { useToast, ToastContainer } from '../components/Toast';
 
 function CreateJob() {
     const navigate = useNavigate();
@@ -9,14 +10,17 @@ function CreateJob() {
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
+    const { toasts, show: showToast } = useToast();
 
     const handleSubmit = () => {
         api.post('/job-offers', { title, description, status })
             .then(() => {
+                showToast('Job offer created successfully');
                 navigate('/job-offers');
             })
             .catch(() => {
                 setError('Failed to create job offer. Make sure all fields are filled.');
+                showToast('Failed to create job offer', 'error');
             });
     };
 
@@ -24,6 +28,7 @@ function CreateJob() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
+            <ToastContainer toasts={toasts} />
             <RecruiterNavbar activePage="job-offers" />
 
             {/* Content Area */}
