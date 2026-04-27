@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    // GET /api/admin/stats
     public function stats()
     {
         return response()->json([
@@ -21,21 +20,18 @@ class AdminController extends Controller
         ]);
     }
 
-    // GET /api/admin/companies
     public function companies()
     {
         $companies = Company::withCount('users', 'jobOffers')->get();
         return response()->json($companies);
     }
 
-    // GET /api/admin/users
     public function users()
     {
         $users = User::with('company:id,name')->get();
         return response()->json($users);
     }
 
-    // DELETE /api/admin/companies/{id}
     public function deleteCompany($id)
     {
         $company = Company::findOrFail($id);
@@ -43,7 +39,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Company deleted']);
     }
 
-    // DELETE /api/admin/users/{id}
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);

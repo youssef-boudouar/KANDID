@@ -11,18 +11,13 @@ class PublicJobController extends Controller
 {
     public function index()
     {
-        $jobs = JobOffer::where('status', 'active')
-        ->with('company:id,name')
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $jobs = JobOffer::where('status', 'active')->with('company:id,name')->orderBy('created_at', 'desc')->get();
 
         return response()->json($jobs);
     }
     public function show($id)
     {
-        $job = JobOffer::where('status', 'active')
-        ->with('company:id,name')
-        ->findOrFail($id);
+        $job = JobOffer::where('status', 'active')->with('company:id,name')->findOrFail($id);
 
         return response()->json($job);
     }
@@ -32,54 +27,40 @@ class PublicJobController extends Controller
         $job = JobOffer::where('status', 'active')->findOrFail($id);
 
         $validated = $request->validate([
-        'first_name' => 'required|string|max:20',
-        'last_name' => 'required|string|max:20',
-        'email' => 'required|email',
-        'phone' => 'required|string|max:20',
-        'resume' => 'required|file|mimes:pdf|max:2048',
+            'first_name' => 'required|string|max:20',
+            'last_name' => 'required|string|max:20',
+            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
+            'resume' => 'required|file|mimes:pdf|max:2048',
         ]);
 
-        // check if candidate already exists
+        $candidate = Candidate::where('email', $validated['email'])->first();
 
-        $existingCandidate = Candidate::where('email', $validated['email'])->first();
+        if ($candidate) {
+            $alreadyApplied = Application::where('candidate_id', $candidate->id)->where('job_offer_id', $job->id)->exists();
 
-        if($existingCandidate)
-        {
-            $alreadyApplied = Application::where('candidate_id', $existingCandidate->id)
-            ->where('job_offer_id', $job->id)
-            ->exists();
-            if($alreadyApplied)
-            {
-                return response()->json([
-                    'message' => 'You have already applied to this job offer'
-                ], 409);
+            if ($alreadyApplied) {
+                return response()->json(['message' => 'You have already applied to this job offer'], 409); // Conflict with existing data
             }
         }
 
-        // resume upload
-        $resumePath = null;
-        if ($request->hasFile('resume')) {
-            $resumePath = $request->file('resume')->store('resumes', 'public');
-        }
-
-        // create candidate if new
-        $candidate = Candidate::where('email', $validated['email'])->first();
+        $resumePath = $request->file('resume')->store('resumes', 'public');
 
         if (!$candidate) {
             $candidate = Candidate::create([
                 'first_name' => $validated['first_name'],
-                'last_name'  => $validated['last_name'],
-                'email'      => $validated['email'],
-                'phone'      => $validated['phone'],
+                'last_name' => $validated['last_name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'resume_path' => $resumePath,
             ]);
         }
+        else {
+            $candidate->resume_path = $resumePath;
+            $candidate->save();
+        }
 
-        if ($resumePath) {
-    $candidate->resume_path = $resumePath;
-    $candidate->save();
-}
-
-        $application = Application::create([
+        Application::create([
             'candidate_id' => $candidate->id,
             'job_offer_id' => $job->id,
             'status' => 'screening',

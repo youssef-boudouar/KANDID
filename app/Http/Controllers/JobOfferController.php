@@ -32,8 +32,7 @@ class JobOfferController extends Controller
 
     public function show(Request $request, $id)
     {
-        $jobOffer = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)
-            ->findOrFail($id);
+        $jobOffer = JobOffer::withCount('applications')->where('company_id', $request->user()->company_id)->findOrFail($id);
 
         return response()->json($jobOffer);
     }
