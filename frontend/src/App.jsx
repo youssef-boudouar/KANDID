@@ -11,16 +11,9 @@ import PublicJobApply from './pages/PublicJobApply';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
-
-function ProtectedRoute({ children }) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        return <Navigate to="/login" />;
-    }
-    return children;
-}
-
 function App() {
+    const token = localStorage.getItem('token');
+
     return (
         <BrowserRouter>
             <Routes>
@@ -31,17 +24,17 @@ function App() {
                 <Route path="/jobs/:id" element={<PublicJobApply />} />
 
                 {/* Recruiter only routes */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/job-offers" element={<ProtectedRoute><JobOffers /></ProtectedRoute>} />
-                <Route path="/job-offers/create" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
-                <Route path="/job-offers/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
-                <Route path="/job-offers/:id/edit" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
-                <Route path="/job-offers/:id/pipeline" element={<ProtectedRoute><KanbanBoard /></ProtectedRoute>} />
+                <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
+                <Route path="/job-offers" element={token ? <JobOffers /> : <Navigate to="/login" />} />
+                <Route path="/job-offers/create" element={token ? <CreateJob /> : <Navigate to="/login" />} />
+                <Route path="/job-offers/:id" element={token ? <JobDetails /> : <Navigate to="/login" />} />
+                <Route path="/job-offers/:id/edit" element={token ? <EditJob /> : <Navigate to="/login" />} />
+                <Route path="/job-offers/:id/pipeline" element={token ? <KanbanBoard /> : <Navigate to="/login" />} />
 
                 {/* Admin only */}
-                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin" element={token ? <AdminDashboard /> : <Navigate to="/login" />} />
 
-                {/* Unknown URL*/}
+                {/* False URL */}
                 <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
         </BrowserRouter>
@@ -49,4 +42,3 @@ function App() {
 }
 
 export default App;
-
