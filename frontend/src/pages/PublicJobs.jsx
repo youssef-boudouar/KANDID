@@ -26,12 +26,12 @@ function PublicJobs() {
             {/* ─── Navbar ─── */}
             <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
                 <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-                    <span
-                        className="text-lg font-extrabold tracking-tight text-[#0a0a0a] cursor-pointer select-none"
+                    <img
+                        src="/kandid_logo.png"
+                        alt="Kandid"
+                        className="h-7 w-auto object-contain cursor-pointer select-none"
                         onClick={() => navigate('/jobs')}
-                    >
-                        KANDID
-                    </span>
+                    />
 
                     <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium">
                         <a href="/jobs" className="text-[#0a0a0a] font-semibold border-b-2 border-[#0a0a0a] pb-0.5">Browse Jobs</a>
@@ -77,7 +77,7 @@ function PublicJobs() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search by job title, keyword, or company..."
+                                placeholder="Search by job title"
                                 className="flex-1 py-3 px-2 pr-5 text-sm text-[#0a0a0a] placeholder-gray-400 bg-transparent focus:outline-none"
                             />
                         </div>
@@ -170,7 +170,14 @@ function PublicJobs() {
             {/* ─── Footer ─── */}
             <footer className="border-t border-gray-100">
                 <p className="text-sm text-gray-300 py-8 text-center font-medium">
-                    Powered by <span className="font-extrabold text-gray-400">KANDID</span>
+                    <span className="inline-flex items-center gap-1.5 text-gray-400">
+                        Powered by
+                        <img
+                            src="/kandid_logo.png"
+                            alt="Kandid"
+                            className="h-4 w-auto object-contain opacity-50 select-none"
+                        />
+                    </span>
                 </p>
             </footer>
         </div>

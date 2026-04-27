@@ -48,16 +48,18 @@ function JobOffers() {
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
                 <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    <span className="text-xl font-extrabold tracking-tight text-gray-900">
-                        KAND<span className="text-black">ID</span>
-                    </span>
+                    <img
+                        src="/kandid_logo.png"
+                        alt="Kandid"
+                        className="h-8 w-auto object-contain select-none"
+                    />
                     <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
                         <span onClick={() => navigate('/dashboard')} className="cursor-pointer hover:text-black transition-colors">Dashboard</span>
                         <span className="cursor-pointer text-black font-bold border-b-2 border-black pb-1">Job Offers</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-gray-700">{companyName}</span>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                        <div className="w-9 h-9 rounded-full  bg-black flex items-center justify-center text-white text-sm font-bold shadow-md">
                             {userName.charAt(0).toUpperCase()}
                         </div>
                         <div className="relative">
@@ -105,7 +107,7 @@ function JobOffers() {
                         <button
                             onClick={() => {
                                 localStorage.removeItem('token');
-                                window.location.href = '/login';
+                                navigate('/login');
                             }}
                             className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium ml-2"
                         >
