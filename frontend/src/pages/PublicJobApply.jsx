@@ -32,6 +32,11 @@ function PublicJobApply() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        if (!resumeRef.current || !resumeRef.current.files[0]) {
+            setError('Please upload your resume');
+            return;
+        }
+
         const formData = new FormData();
 
         formData.append('first_name', firstName);
@@ -44,8 +49,8 @@ function PublicJobApply() {
         .then(() => {
             setSubmitted(true);
         })
-        .catch(()=>{
-            setError('Failed to submit application');
+        .catch((error)=>{
+            setError(error.response?.data?.message || 'Failed to submit application');
         });
     };
 
@@ -56,9 +61,11 @@ function PublicJobApply() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-50/40 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="relative max-w-md mx-auto px-6 min-h-screen flex flex-col items-center justify-center text-center">
-                    <span className="text-lg font-extrabold tracking-tight text-[#0a0a0a] inline-flex items-center gap-1 mb-12">
-                        KANDID
-                    </span>
+                    <img
+                        src="/kandid_logo.png"
+                        alt="Kandid"
+                        className="h-7 w-auto object-contain mb-12 select-none"
+                    />
 
                     <div className="w-20 h-20 rounded-full bg-emerald-50 border-4 border-emerald-100 flex items-center justify-center mb-8">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -92,12 +99,12 @@ function PublicJobApply() {
             {/* ─── Navbar ─── */}
             <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
                 <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-                    <span
-                        className="text-lg font-extrabold tracking-tight text-[#0a0a0a] cursor-pointer select-none"
+                    <img
+                        src="/kandid_logo.png"
+                        alt="Kandid"
+                        className="h-7 w-auto object-contain cursor-pointer select-none"
                         onClick={() => navigate('/jobs')}
-                    >
-                        KANDID
-                    </span>
+                    />
 
                     <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 font-medium">
                         <a href="/jobs" className="text-[#0a0a0a] font-semibold border-b-2 border-[#0a0a0a] pb-0.5">Browse Jobs</a>
@@ -172,7 +179,7 @@ function PublicJobApply() {
                                 <div className="w-12 h-12 rounded-full bg-[#0a0a0a] text-white font-bold flex items-center justify-center text-lg">
                                     {(job.company?.name || 'U').charAt(0).toUpperCase()}
                                 </div>
-                                <span className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider">
+                                <span className="text-m font-semibold text-[#6b7280] uppercase tracking-wider">
                                     {job.company?.name || 'Unknown'}
                                 </span>
                             </div>
@@ -219,7 +226,7 @@ function PublicJobApply() {
                                     <h3 className="text-lg font-bold text-[#0a0a0a] mb-1">
                                         Apply for this position
                                     </h3>
-                                    <p className="text-xs text-gray-400 mb-6">Take the first step toward your next career milestone.</p>
+                                    <p className="text-xs text-gray-400 mb-6">Take the first step toward your next career</p>
 
                                     {/* Error message */}
                                     {error && (
@@ -278,12 +285,13 @@ function PublicJobApply() {
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 placeholder="+1 (555) 000-0000"
                                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm placeholder-gray-300 focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-4 focus:ring-gray-100 transition-all"
+                                                required
                                             />
                                         </div>
 
                                         {/* Resume upload */}
                                         <div>
-                                            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Resume / CV</label>
+                                            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Resume</label>
                                             <div
                                                 onClick={() => resumeRef.current?.click()}
                                                 className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-gray-400 hover:bg-gray-50/50 transition-colors cursor-pointer"
@@ -309,9 +317,9 @@ function PublicJobApply() {
                                                             </svg>
                                                         </div>
                                                         <p className="text-xs font-medium text-[#6b7280]">
-                                                            Drop your PDF here or click to browse
+                                                            Upload Your Resume Here
                                                         </p>
-                                                        <p className="text-[10px] text-gray-300 mt-1">PDF only, max 2MB</p>
+                                                        <p className="text-[10px] text-gray-300 mt-1">PDF only</p>
                                                     </>
                                                 )}
                                                 <input
@@ -347,7 +355,14 @@ function PublicJobApply() {
             {/* ─── Footer ─── */}
             <footer className="border-t border-gray-100 mt-12">
                 <p className="text-sm text-gray-300 py-8 text-center font-medium">
-                    Powered by <span className="font-extrabold text-gray-400">KANDID</span>
+                    <span className="inline-flex items-center gap-1.5 text-gray-400">
+                        Powered by
+                        <img
+                            src="/kandid_logo.png"
+                            alt="Kandid"
+                            className="h-4 w-auto object-contain opacity-50 select-none"
+                        />
+                    </span>
                 </p>
             </footer>
         </div>

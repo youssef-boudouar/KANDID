@@ -14,12 +14,12 @@ function KanbanBoard() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedApp, setSelectedApp] = useState(null);
     const [notes, setNotes] = useState([]);
-    const [newNote, setNewNote] = useState('');
-    const [companyName, setCompanyName] = useState('');
-    const [userName, setUserName] = useState('');
+    const [newNote, setNewNote] = useState("");
+    const [companyName, setCompanyName] = useState("");
+    const [userName, setUserName] = useState("");
     const [currentUserId, setCurrentUserId] = useState(null);
     const [showInvite, setShowInvite] = useState(false);
-    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteEmail, setInviteEmail] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,26 +39,34 @@ function KanbanBoard() {
             .then((response) => {
                 setApplications(response.data);
                 setLoading(false);
-            });
+            })
+            .catch(() => { setLoading(false); });
 
-        axios.get('http://localhost:8000/api/user', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
-            setUserName(response.data.name);
-            setCompanyName(response.data.company?.name || '');
-            setCurrentUserId(response.data.id);
-        });
+        axios
+            .get("http://localhost:8000/api/user", {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => {
+                setUserName(response.data.name);
+                setCompanyName(response.data.company?.name || "");
+                setCurrentUserId(response.data.id); // check note ownership
+            });
     }, []);
 
-    const getByStatus = (status) => {  // takes status and return only apps that match the status + search
+    const getByStatus = (status) => {
+        // takes status and return only apps that match the status/search
         const results = [];
 
         for (let i = 0; i < applications.length; i++) {
+            const fullName =
+                applications[i].candidate.first_name +
+                " " +
+                applications[i].candidate.last_name;
 
-            const fullName = applications[i].candidate.first_name + " " + applications[i].candidate.last_name;
-
-            if ( applications[i].status === status && fullName.toLowerCase().includes(searchQuery.toLowerCase()) )
-            {
+            if (
+                applications[i].status === status &&
+                fullName.toLowerCase().includes(searchQuery.toLowerCase())
+            ) {
                 results.push(applications[i]);
             }
         }
@@ -69,14 +77,16 @@ function KanbanBoard() {
     const onDragEnd = (result) => {
         if (!result.destination) return; // dropped out of droppable zones
 
-        if ( // dropped to the same original place
+        if (
+            // dropped to the same original place
             result.source.droppableId === result.destination.droppableId &&
             result.source.index === result.destination.index
         )
             return;
 
         const updatedApplications = applications.map((app) => {
-            if (app.id === parseInt(result.draggableId)) { // checking which card was dragged
+            if (app.id === parseInt(result.draggableId)) {
+                // checking which card was dragged
                 app.status = result.destination.droppableId;
                 app.kanban_order = result.destination.index;
             }
@@ -85,7 +95,7 @@ function KanbanBoard() {
 
         setApplications(updatedApplications);
 
-        // update the column && index of the dragged item on backend
+        // update dragged item on backend
         const token = localStorage.getItem("token");
         axios.put(
             `http://localhost:8000/api/applications/${result.draggableId}/move`,
@@ -101,41 +111,51 @@ function KanbanBoard() {
 
     const openPanel = (app) => {
         setSelectedApp(app);
-        setNewNote(''); // Clear note input
-        const token = localStorage.getItem('token');
-        axios.get(`http://localhost:8000/api/applications/${app.id}/notes`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
-            setNotes(response.data);
-        });
+        setNewNote(""); // Clear note input
+        const token = localStorage.getItem("token");
+        axios
+            .get(`http://localhost:8000/api/applications/${app.id}/notes`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => {
+                setNotes(response.data);
+            });
     };
 
     const closePanel = () => {
         setSelectedApp(null);
         setNotes([]);
-        setNewNote('');
+        setNewNote("");
     };
 
     const addNote = () => {
         if (!newNote.trim()) return;
-        const token = localStorage.getItem('token');
-        axios.post(`http://localhost:8000/api/applications/${selectedApp.id}/notes`, {
-            content: newNote,
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
-            setNotes([response.data, ...notes]);
-            setNewNote('');
-        });
+        const token = localStorage.getItem("token");
+        axios
+            .post(
+                `http://localhost:8000/api/applications/${selectedApp.id}/notes`,
+                {
+                    content: newNote,
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                },
+            )
+            .then((response) => {
+                setNotes([response.data, ...notes]); //add new note to top of the list
+                setNewNote("");
+            });
     };
 
     const deleteNote = (noteId) => {
-        const token = localStorage.getItem('token');
-        axios.delete(`http://localhost:8000/api/notes/${noteId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(() => {
-            setNotes(notes.filter(note => note.id !== noteId));
-        });
+        const token = localStorage.getItem("token");
+        axios
+            .delete(`http://localhost:8000/api/notes/${noteId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(() => {
+                setNotes(notes.filter((note) => note.id !== noteId));
+            });
     };
 
     if (loading) {
@@ -151,15 +171,19 @@ function KanbanBoard() {
             {/* ─── Navbar ─── */}
             <nav className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
                 <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    <span
-                        className="text-xl font-extrabold tracking-tight text-gray-900 cursor-pointer"
+                    <div
                         onClick={() => navigate("/job-offers")}
+                        className="cursor-pointer"
                     >
-                        KAND<span className="text-black">ID</span>
-                    </span>
+                        <img
+                            src="/kandid_logo.png"
+                            alt="Kandid"
+                            className="h-8 w-auto object-contain select-none"
+                        />
+                    </div>
                     <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
                         <span
-                            onClick={() => navigate('/dashboard')}
+                            onClick={() => navigate("/dashboard")}
                             className="cursor-pointer hover:text-black transition-colors"
                         >
                             Dashboard
@@ -178,11 +202,16 @@ function KanbanBoard() {
                         <span className="text-sm font-semibold text-gray-700">
                             {companyName}
                         </span>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                        <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-sm font-bold shadow-md">
                             {userName.charAt(0).toUpperCase()}
                         </div>
                         <div className="relative">
-                            {showInvite && <div className="fixed inset-0 z-40" onClick={() => setShowInvite(false)} />}
+                            {showInvite && (
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setShowInvite(false)}
+                                />
+                            )}
                             <button
                                 onClick={() => setShowInvite(!showInvite)}
                                 className="text-xs text-gray-500 hover:text-black transition-colors font-medium"
@@ -192,29 +221,45 @@ function KanbanBoard() {
 
                             {showInvite && (
                                 <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-72 z-50">
-                                    <p className="text-sm font-bold text-gray-900 mb-3">Invite Team Member</p>
+                                    <p className="text-sm font-bold text-gray-900 mb-3">
+                                        Invite Team Member
+                                    </p>
                                     <input
                                         type="email"
                                         value={inviteEmail}
-                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                        onChange={(e) =>
+                                            setInviteEmail(e.target.value)
+                                        }
                                         placeholder="colleague@company.com"
                                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 mb-3"
                                     />
                                     <button
                                         onClick={() => {
                                             if (!inviteEmail) return;
-                                            const token = localStorage.getItem('token');
-                                            axios.post('http://localhost:8000/api/team/invite', {
-                                                email: inviteEmail,
-                                            }, {
-                                                headers: { Authorization: `Bearer ${token}` }
-                                            }).then(() => {
-                                                alert('Invitation sent!');
-                                                setInviteEmail('');
-                                                setShowInvite(false);
-                                            }).catch(() => {
-                                                alert('Failed to send invitation');
-                                            });
+                                            const token =
+                                                localStorage.getItem("token");
+                                            axios
+                                                .post(
+                                                    "http://localhost:8000/api/team/invite",
+                                                    {
+                                                        email: inviteEmail,
+                                                    },
+                                                    {
+                                                        headers: {
+                                                            Authorization: `Bearer ${token}`,
+                                                        },
+                                                    },
+                                                )
+                                                .then(() => {
+                                                    alert("Invitation sent!");
+                                                    setInviteEmail("");
+                                                    setShowInvite(false);
+                                                })
+                                                .catch(() => {
+                                                    alert(
+                                                        "Failed to send invitation",
+                                                    );
+                                                });
                                         }}
                                         className="w-full py-2 bg-black text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors"
                                     >
@@ -225,8 +270,8 @@ function KanbanBoard() {
                         </div>
                         <button
                             onClick={() => {
-                                localStorage.removeItem('token');
-                                window.location.href = '/login';
+                                localStorage.removeItem("token");
+                                navigate("/login");
                             }}
                             className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium ml-2"
                         >
@@ -317,7 +362,15 @@ function KanbanBoard() {
                                             className={`w-2 h-2 rounded-full ${s === "screening" ? "bg-blue-500" : s === "interview" ? "bg-purple-500" : s === "technical" ? "bg-amber-500" : s === "hired" ? "bg-emerald-500" : "bg-red-500"}`}
                                         />
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-gray-600">
-                                            {s === "screening" ? "Screening" : s === "interview" ? "Interview" : s === "technical" ? "Technical" : s === "hired" ? "Hired" : "Rejected"}
+                                            {s === "screening"
+                                                ? "Screening"
+                                                : s === "interview"
+                                                  ? "Interview"
+                                                  : s === "technical"
+                                                    ? "Technical"
+                                                    : s === "hired"
+                                                      ? "Hired"
+                                                      : "Rejected"}
                                         </span>
                                     </div>
                                     <span className="min-w-[22px] h-[22px] bg-gray-100 text-gray-500 text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -327,15 +380,11 @@ function KanbanBoard() {
 
                                 {/* Column body */}
                                 <Droppable droppableId={s}>
-                                    {(provided, snapshot) => (
+                                    {(provided) => (
                                         <div
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
-                                            className={`p-3 flex-1 transition-colors duration-200 ${
-                                                snapshot.isDraggingOver
-                                                    ? "bg-blue-50/30"
-                                                    : "bg-gray-50/50"
-                                            }`}
+                                            ref={provided.innerRef} // tells pangea which div is the column
+                                            {...provided.droppableProps} // let pangea detect when cards enter/leave a column
+                                            className="p-3 flex-1 bg-gray-50"
                                         >
                                             {getByStatus(s).length === 0 && (
                                                 <div className="flex flex-col items-center justify-center py-12 opacity-40">
@@ -375,29 +424,15 @@ function KanbanBoard() {
                                                 </div>
                                             )}
 
-                                            {getByStatus(s).map(
-                                                (app, index) => {
-                                                    const daysAgo =
-                                                        app.created_at
-                                                            ? Math.floor(
-                                                                  (new Date() -
-                                                                      new Date(
-                                                                          app.created_at,
-                                                                      )) /
-                                                                      (1000 *
-                                                                          60 *
-                                                                          60 *
-                                                                          24),
-                                                              )
-                                                            : null;
-                                                    const daysLabel =
-                                                        daysAgo === null
-                                                            ? "Applied"
-                                                            : daysAgo === 0
-                                                              ? "Applied today"
-                                                              : daysAgo === 1
-                                                                ? "Applied yesterday"
-                                                                : `Applied ${daysAgo} days ago`;
+                                            {getByStatus(s).map((app, index) => {
+                                                    let daysAgo = null;
+                                                    if (app.created_at) {
+                                                        daysAgo = Math.floor((new Date() - new Date(app.created_at)) / (1000 * 60 * 60 * 24));
+                                                    }
+                                                    let whenApplied = "Applied";
+                                                    if (daysAgo === 0) whenApplied = "Applied today";
+                                                    if (daysAgo === 1) whenApplied = "Applied yesterday";
+                                                    if (daysAgo > 1)  whenApplied = `Applied ${daysAgo} days ago`;
 
                                                     return (
                                                         <Draggable
@@ -407,21 +442,12 @@ function KanbanBoard() {
                                                             index={index}
                                                             key={app.id}
                                                         >
-                                                            {(
-                                                                provided,
-                                                                snapshot,
-                                                            ) => (
+                                                            {(provided) => (
                                                                 <div
-                                                                    ref={
-                                                                        provided.innerRef
-                                                                    }
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                    className={`group bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-grab active:cursor-grabbing ${
-                                                                        snapshot.isDragging
-                                                                            ? "shadow-xl"
-                                                                            : ""
-                                                                    }`}
+                                                                    ref={provided.innerRef} // tells pangea which div the card
+                                                                    {...provided.draggableProps} // pangea uses this to move the card visually while dragging
+                                                                    {...provided.dragHandleProps} // makes element the thing you grab to drag
+                                                                    className="group bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-grab active:cursor-grabbing"
                                                                 >
                                                                     {/* Card top */}
                                                                     <div className="flex items-start gap-3">
@@ -513,46 +539,6 @@ function KanbanBoard() {
                                                                                     </svg>
                                                                                 </span>
                                                                             )}
-                                                                            {/* Grip icon */}
-                                                                            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300">
-                                                                                <svg
-                                                                                    width="12"
-                                                                                    height="12"
-                                                                                    viewBox="0 0 12 12"
-                                                                                    fill="currentColor"
-                                                                                >
-                                                                                    <circle
-                                                                                        cx="4"
-                                                                                        cy="2"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                    <circle
-                                                                                        cx="8"
-                                                                                        cy="2"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                    <circle
-                                                                                        cx="4"
-                                                                                        cy="6"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                    <circle
-                                                                                        cx="8"
-                                                                                        cy="6"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                    <circle
-                                                                                        cx="4"
-                                                                                        cy="10"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                    <circle
-                                                                                        cx="8"
-                                                                                        cy="10"
-                                                                                        r="1.2"
-                                                                                    />
-                                                                                </svg>
-                                                                            </span>
                                                                         </div>
                                                                     </div>
 
@@ -597,18 +583,52 @@ function KanbanBoard() {
                                                                                 />
                                                                             </svg>
                                                                             {
-                                                                                daysLabel
+                                                                                whenApplied
                                                                             }
                                                                         </span>
                                                                         <div className="flex items-center gap-2">
                                                                             <span
                                                                                 className={`text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${app.status === "screening" ? "bg-blue-50 text-blue-600" : app.status === "interview" ? "bg-purple-50 text-purple-600" : app.status === "technical" ? "bg-amber-50 text-amber-600" : app.status === "hired" ? "bg-emerald-50 text-emerald-600" : app.status === "rejected" ? "bg-red-50 text-red-600" : s === "screening" ? "bg-blue-50 text-blue-600" : s === "interview" ? "bg-purple-50 text-purple-600" : s === "technical" ? "bg-amber-50 text-amber-600" : s === "hired" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
                                                                             >
-                                                                                {app.status === "screening" ? "Screening" : app.status === "interview" ? "Interview" : app.status === "technical" ? "Technical" : app.status === "hired" ? "Hired" : app.status === "rejected" ? "Rejected" : s === "screening" ? "Screening" : s === "interview" ? "Interview" : s === "technical" ? "Technical" : s === "hired" ? "Hired" : "Rejected"}
+                                                                                {app.status ===
+                                                                                "screening"
+                                                                                    ? "Screening"
+                                                                                    : app.status ===
+                                                                                        "interview"
+                                                                                      ? "Interview"
+                                                                                      : app.status ===
+                                                                                          "technical"
+                                                                                        ? "Technical"
+                                                                                        : app.status ===
+                                                                                            "hired"
+                                                                                          ? "Hired"
+                                                                                          : app.status ===
+                                                                                              "rejected"
+                                                                                            ? "Rejected"
+                                                                                            : s ===
+                                                                                                "screening"
+                                                                                              ? "Screening"
+                                                                                              : s ===
+                                                                                                  "interview"
+                                                                                                ? "Interview"
+                                                                                                : s ===
+                                                                                                    "technical"
+                                                                                                  ? "Technical"
+                                                                                                  : s ===
+                                                                                                      "hired"
+                                                                                                    ? "Hired"
+                                                                                                    : "Rejected"}
                                                                             </span>
                                                                             <button
                                                                                 type="button"
-                                                                                onClick={(e) => { e.stopPropagation(); openPanel(app); }}
+                                                                                onClick={(
+                                                                                    e,
+                                                                                ) => {
+                                                                                    e.stopPropagation(); // stopping the eye icon
+                                                                                    openPanel(          // from triggering the drag behavior on click
+                                                                                        app,
+                                                                                    );
+                                                                                }}
                                                                                 className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
                                                                             >
                                                                                 <svg
@@ -622,7 +642,11 @@ function KanbanBoard() {
                                                                                     strokeLinejoin="round"
                                                                                 >
                                                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                                                    <circle cx="12" cy="12" r="3" />
+                                                                                    <circle
+                                                                                        cx="12"
+                                                                                        cy="12"
+                                                                                        r="3"
+                                                                                    />
                                                                                 </svg>
                                                                             </button>
                                                                         </div>
@@ -633,7 +657,7 @@ function KanbanBoard() {
                                                     );
                                                 },
                                             )}
-                                            {provided.placeholder}
+                                             {provided.placeholder}  {/* keeps column height stable while dragging */}
                                         </div>
                                     )}
                                 </Droppable>
@@ -682,11 +706,14 @@ function KanbanBoard() {
                             <div
                                 className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${selectedApp.status === "screening" ? "bg-gradient-to-br from-blue-400 to-blue-600" : selectedApp.status === "interview" ? "bg-gradient-to-br from-purple-400 to-purple-600" : selectedApp.status === "technical" ? "bg-gradient-to-br from-amber-400 to-amber-600" : selectedApp.status === "hired" ? "bg-gradient-to-br from-emerald-400 to-emerald-600" : "bg-gradient-to-br from-red-400 to-red-600"}`}
                             >
-                                {selectedApp.candidate?.first_name?.[0]?.toUpperCase() || ""}
-                                {selectedApp.candidate?.last_name?.[0]?.toUpperCase() || ""}
+                                {selectedApp.candidate?.first_name?.[0]?.toUpperCase() ||
+                                    ""}
+                                {selectedApp.candidate?.last_name?.[0]?.toUpperCase() ||
+                                    ""}
                             </div>
                             <div className="text-xl font-bold text-gray-900 mt-4">
-                                {selectedApp.candidate?.first_name} {selectedApp.candidate?.last_name}
+                                {selectedApp.candidate?.first_name}{" "}
+                                {selectedApp.candidate?.last_name}
                             </div>
                             <div className="text-sm text-gray-500 mt-1">
                                 {selectedApp.candidate?.email}
@@ -700,7 +727,15 @@ function KanbanBoard() {
                                 <span
                                     className={`text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${selectedApp.status === "screening" ? "bg-blue-50 text-blue-600" : selectedApp.status === "interview" ? "bg-purple-50 text-purple-600" : selectedApp.status === "technical" ? "bg-amber-50 text-amber-600" : selectedApp.status === "hired" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
                                 >
-                                    {selectedApp.status === "screening" ? "Screening" : selectedApp.status === "interview" ? "Interview" : selectedApp.status === "technical" ? "Technical" : selectedApp.status === "hired" ? "Hired" : "Rejected"}
+                                    {selectedApp.status === "screening"
+                                        ? "Screening"
+                                        : selectedApp.status === "interview"
+                                          ? "Interview"
+                                          : selectedApp.status === "technical"
+                                            ? "Technical"
+                                            : selectedApp.status === "hired"
+                                              ? "Hired"
+                                              : "Rejected"}
                                 </span>
                             </div>
                             {selectedApp.candidate?.resume_path && (
@@ -774,10 +809,13 @@ function KanbanBoard() {
                                         >
                                             <div className="flex items-center justify-between">
                                                 <span className="text-xs font-semibold text-gray-700">
-                                                    {note.user?.name || "Recruiter"}
+                                                    {note.user?.name ||
+                                                        "Former recruiter"}
                                                 </span>
                                                 <span className="text-[10px] text-gray-300">
-                                                    {new Date(note.created_at).toLocaleDateString()}
+                                                    {new Date(
+                                                        note.created_at,
+                                                    ).toLocaleDateString()}
                                                 </span>
                                             </div>
                                             <div className="text-sm text-gray-600 mt-2 leading-relaxed break-words">
@@ -785,7 +823,9 @@ function KanbanBoard() {
                                             </div>
                                             {note.user_id === currentUserId && (
                                                 <div
-                                                    onClick={() => deleteNote(note.id)}
+                                                    onClick={() =>
+                                                        deleteNote(note.id)
+                                                    }
                                                     className="mt-2 text-[10px] text-red-400 hover:text-red-600 cursor-pointer opacity-0 group-hover:opacity-100"
                                                 >
                                                     Delete

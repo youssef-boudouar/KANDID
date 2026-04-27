@@ -13,20 +13,17 @@ function AdminDashboard() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
 
-        axios
-            .get("http://localhost:8000/api/admin/stats", { headers })
+        axios.get("http://localhost:8000/api/admin/stats", { headers })
             .then((response) => {
                 setStats(response.data);
             });
 
-        axios
-            .get("http://localhost:8000/api/admin/companies", { headers })
+        axios.get("http://localhost:8000/api/admin/companies", { headers })
             .then((response) => {
                 setCompanies(response.data);
             });
 
-        axios
-            .get("http://localhost:8000/api/admin/users", { headers })
+        axios.get("http://localhost:8000/api/admin/users", { headers })
             .then((response) => {
                 setUsers(response.data);
                 setLoading(false);
@@ -57,13 +54,6 @@ function AdminDashboard() {
             });
     };
 
-    const getRolePill = (role) => {
-        if (role === "admin") return "bg-red-100 text-red-600";
-        if (role === "recruiter") return "bg-blue-100 text-blue-600";
-        if (role === "super_admin") return "bg-purple-100 text-purple-600";
-        return "bg-gray-100 text-gray-600";
-    };
-
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
             {/* Admin Navigation */}
@@ -77,7 +67,7 @@ function AdminDashboard() {
                     <button
                         onClick={() => {
                             localStorage.removeItem("token");
-                            window.location.href = "/login";
+                            navigate('/login');
                         }}
                         className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
                     >
@@ -207,7 +197,7 @@ function AdminDashboard() {
                                 All Users
                             </h2>
                             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                                <div className="grid grid-cols-5 gap-4 bg-gray-50 text-[11px] uppercase tracking-widest text-gray-400 font-semibold px-6 py-3">
+                                <div className="grid grid-cols-4 gap-4 bg-gray-50 text-[11px] uppercase tracking-widest text-gray-400 font-semibold px-6 py-3">
                                     <div>Name</div>
                                     <div>Email</div>
                                     <div>Company</div>
@@ -218,7 +208,7 @@ function AdminDashboard() {
                                     .map((user) => (
                                         <div
                                             key={user.id}
-                                            className="grid grid-cols-5 gap-4 border-t border-gray-100 px-6 py-4 items-center"
+                                            className="grid grid-cols-4 gap-4 border-t border-gray-100 px-6 py-4 items-center"
                                         >
                                             <div className="text-sm font-semibold text-gray-900">
                                                 {user.name}
