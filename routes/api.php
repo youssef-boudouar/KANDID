@@ -19,6 +19,8 @@ Route::post('/login', [AuthController::class, 'login']);
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // get company name for navbar
     Route::get('/user', function (Request $request) {
         return $request->user()->load('company');
     });
@@ -45,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
 
-    Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
+    Route::middleware(AdminMiddleware::class)->group(function () {
     Route::get('/admin/stats', [AdminController::class, 'stats']);
     Route::get('/admin/companies', [AdminController::class, 'companies']);
     Route::get('/admin/users', [AdminController::class, 'users']);

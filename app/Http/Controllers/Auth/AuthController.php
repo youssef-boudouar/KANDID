@@ -17,7 +17,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // === Invitation register ===
+        // Invitation register
         if ($request->invite_token) {
             $invitation = Invitation::where('token', $request->invite_token)->first();
 
@@ -31,13 +31,14 @@ class AuthController extends Controller
                 'password' => 'required|string|confirmed|min:8',
             ]);
 
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'],
+            if ($invitation->email !== $validated['email']) {
+                return response()->json(['message' => 'Email does not match the invitation'], 400);
+            }
+
+            $user = User::create(array_merge($validated, [
                 'company_id' => $invitation->company_id,
                 'role' => 'recruiter',
-            ]);
+            ]));
 
             $invitation->delete();
 
@@ -50,42 +51,38 @@ class AuthController extends Controller
             ], 201);
         }
 
-        // === Normal Registeration ===
-
-        // Validate User Infos
+        // Normal Register
         $validatedUserInfos = $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|confirmed|min:8',
         ]);
-        // Validate Company Infos
+
         $validatedCompanyInfos = $request->validate([
             'company_name' => 'required|string|max:50',
             'domain' => 'nullable|string|unique:companies',
         ]);
-        // ALL OR NOTHING (Either creating company + user (recruiter) Or Fail)
+
+        // ALL OR NOTHING
         $result = DB::transaction(function () use ($validatedCompanyInfos, $validatedUserInfos) {
-            // create company
+
             $company = Company::create([
                 'name' => $validatedCompanyInfos['company_name'],
-                'domain' => $validatedCompanyInfos['domain'] ?? null,
+                'domain' => $validatedCompanyInfos['domain'],
             ]);
-            // create user (merging already validated data + FK and role in one array)
+
             $user = User::create(array_merge($validatedUserInfos, ['company_id' => $company->id, 'role' => 'recruiter']));
 
-            // create token
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // Returning because we can't acced an anonymous function (Closure) from outside it
             return ['user' => $user, 'token' => $token];
         });
 
-        // convert and send the final JSON data to frontend
         return response()->json([
             'message' => 'registered successfully',
             'token' => $result['token'],
             'user' => $result['user'],
-        ], 201); // 201 = "Created" Standard API status for making a new record (by default set to 200 which means just success but 201 means success + creating something)
+        ], 201); // Created
     }
 
     public function login(Request $request)
@@ -100,7 +97,7 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid email or password'
-            ], 401);
+            ], 401); // Unauthorized
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
