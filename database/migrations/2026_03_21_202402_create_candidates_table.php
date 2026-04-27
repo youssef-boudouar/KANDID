@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email');
-            $table->string('phone')->nullable();
-            $table->text('resume_path')->nullable();
+            $table->string('phone');
+            $table->text('resume_path');
             $table->timestamps();
         });
     }
