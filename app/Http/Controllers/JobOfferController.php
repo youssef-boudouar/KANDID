@@ -12,7 +12,7 @@ class JobOfferController extends Controller
 {
     public function index(Request $request)
     {
-        $jobOffers = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->get();
+        $jobOffers = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->with('tags')->get();
 
         return JobOfferResource::collection($jobOffers);
     }
@@ -31,7 +31,7 @@ class JobOfferController extends Controller
 
     public function show(Request $request, $id)
     {
-        $jobOffer = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->findOrFail($id);
+        $jobOffer = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->with('tags')->findOrFail($id);
 
         return new JobOfferResource($jobOffer);
     }

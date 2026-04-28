@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PublicJobController;
+use App\Http\Controllers\TagController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/job-offers/{id}', [JobOfferController::class, 'show']);
     Route::put('/job-offers/{id}', [JobOfferController::class, 'update']);
     Route::delete('/job-offers/{id}', [JobOfferController::class, 'destroy']);
+
+    // Tags CRUD
+    Route::get('/tags', [TagController::class, 'index']);
+    Route::post('/tags', [TagController::class, 'store']);
+    Route::put('/tags/{id}', [TagController::class, 'update']);
+    Route::delete('/tags/{id}', [TagController::class, 'destroy']);
+    Route::post('/job-offers/{id}/tags', [TagController::class, 'attachToJob']);
+    Route::delete('/job-offers/{id}/tags/{tagId}', [TagController::class, 'detachFromJob']);
 
     // Applications
     Route::get('/job-offers/{jobOfferId}/applications', [ApplicationController::class, 'index']);
