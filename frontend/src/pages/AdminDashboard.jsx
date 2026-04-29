@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from '../context/AuthContext';
 import { useToast, ToastContainer } from '../components/Toast';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
     const [companies, setCompanies] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pendingAction, setPendingAction] = useState(null);
+    const [confirmMessage, setConfirmMessage] = useState('');
     const navigate = useNavigate();
     const { logout } = useAuth();
     const { toasts, show: showToast } = useToast();
@@ -31,31 +35,27 @@ function AdminDashboard() {
             });
     }, []);
 
-    const deleteCompany = (id) => {
-        if (!window.confirm("Delete this company and all its data?")) return;
-        api
-            .delete(`/admin/companies/${id}`)
-            .then(() => {
-                setCompanies(companies.filter((c) => c.id !== id));
-                showToast("Company deleted successfully");
-            })
-            .catch(() => {
-                showToast("Failed to delete company", "error");
-            });
+    const promptDelete = (message, action) => {
+        setConfirmMessage(message);
+        setPendingAction(() => action);
+        setConfirmOpen(true);
     };
 
-    const deleteUser = (id) => {
-        if (!window.confirm("Delete this user?")) return;
-        api
-            .delete(`/admin/users/${id}`)
-            .then(() => {
-                setUsers(users.filter((u) => u.id !== id));
-                showToast("User deleted successfully");
-            })
-            .catch(() => {
-                showToast("Failed to delete user", "error");
-            });
-    };
+    const deleteCompany = (id) => promptDelete(
+        'Delete this company and all its data? This cannot be undone.',
+        () => api.delete(`/admin/companies/${id}`)
+            .then(() => setCompanies(prev => prev.filter(c => c.id !== id)))
+            .then(() => showToast("Company deleted successfully"))
+            .catch(() => showToast('Failed to delete company', 'error'))
+    );
+
+    const deleteUser = (id) => promptDelete(
+        'Delete this user?',
+        () => api.delete(`/admin/users/${id}`)
+            .then(() => setUsers(prev => prev.filter(u => u.id !== id)))
+            .then(() => showToast("User deleted successfully"))
+            .catch(() => showToast('Failed to delete user', 'error'))
+    );
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
@@ -240,6 +240,15 @@ function AdminDashboard() {
                     </>
                 )}
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Confirm Delete"
+                message={confirmMessage}
+                onConfirm={() => { setConfirmOpen(false); pendingAction?.(); }}
+                onCancel={() => setConfirmOpen(false)}
+                confirmLabel="Delete"
+                danger
+            />
         </div>
     );
 }

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
 import { useToast, ToastContainer } from '../components/Toast';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 function JobDetails() {
     const { id } = useParams();
@@ -10,6 +11,7 @@ function JobDetails() {
     const [job, setJob] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
@@ -23,7 +25,11 @@ function JobDetails() {
     }, []);
 
     const handleDelete = () => {
-        if (!window.confirm('Are you sure you want to delete this job offer?')) return; // cancel
+        setConfirmOpen(true);
+    };
+
+    const confirmDelete = () => {
+        setConfirmOpen(false);
         api.delete(`/job-offers/${id}`).then(() => {
             showToast('Job offer deleted successfully');
             navigate('/job-offers');
@@ -164,6 +170,15 @@ function JobDetails() {
                     </>
                 )}
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete Job Offer"
+                message="This will permanently delete the job offer and all associated applications. This cannot be undone."
+                onConfirm={confirmDelete}
+                onCancel={() => setConfirmOpen(false)}
+                confirmLabel="Delete"
+                danger
+            />
         </div>
     );
 }
