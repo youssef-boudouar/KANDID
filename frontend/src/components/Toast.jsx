@@ -1,13 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useToast() {
     const [toasts, setToasts] = useState([]);
+    const timers = useRef({});
 
-    const show = (message, type = 'success') => {
+    const show = useCallback((message, type = 'success') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, message, type }]);
-        setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
-    };
+        timers.current[id] = setTimeout(() => {
+            setToasts(prev => prev.filter(t => t.id !== id));
+            delete timers.current[id];
+        }, 3500);
+    }, []);
+
+    useEffect(() => {
+        return () => Object.values(timers.current).forEach(clearTimeout);
+    }, []);
 
     return { toasts, show };
 }

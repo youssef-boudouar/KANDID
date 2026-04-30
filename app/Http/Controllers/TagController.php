@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JobOffer;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TagController extends Controller
 {
@@ -52,9 +53,13 @@ class TagController extends Controller
     public function attachToJob(Request $request, $jobId)
     {
         $jobOffer = JobOffer::forCompany($request->user()->company_id)->findOrFail($jobId);
+        $companyId = $request->user()->company_id;
         $validated = $request->validate([
             'tag_ids'   => 'required|array',
-            'tag_ids.*' => 'integer',
+            'tag_ids.*' => [
+                'integer',
+                Rule::exists('tags', 'id')->where('company_id', $companyId),
+            ],
         ]);
         $jobOffer->tags()->sync($validated['tag_ids']);
         return response()->json($jobOffer->load('tags'));
