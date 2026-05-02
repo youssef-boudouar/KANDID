@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
 import { useToast, ToastContainer } from '../components/Toast';
+import TagManager from './TagManager';
 
 function CreateJob() {
     const navigate = useNavigate();
@@ -10,18 +11,24 @@ function CreateJob() {
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
+    const [tags, setTags] = useState([]);
+    const [selectedTagIds, setSelectedTagIds] = useState([]);
+    const [showTagManager, setShowTagManager] = useState(false);
     const { toasts, show: showToast } = useToast();
+
+    useEffect(() => {
+        api.get('/tags').then(r => setTags(r.data)).catch(() => {});
+    }, []);
 
     const handleSubmit = () => {
         api.post('/job-offers', { title, description, status })
-            .then(() => {
-                showToast('Job offer created successfully');
-                navigate('/job-offers');
+            .then(response => {
+                if (selectedTagIds.length > 0) {
+                    return api.post(`/job-offers/${response.data.id}/tags`, { tag_ids: selectedTagIds });
+                }
             })
-            .catch(() => {
-                setError('Failed to create job offer. Make sure all fields are filled.');
-                showToast('Failed to create job offer', 'error');
-            });
+            .then(() => navigate('/job-offers'))
+            .catch(() => showToast('Failed to create job offer. Make sure all fields are filled.', 'error'));
     };
 
     const statuses = ['draft', 'active', 'archived'];
@@ -104,6 +111,57 @@ function CreateJob() {
                             className="w-full h-64 p-5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300"
                         />
                     </div>
+
+                    {/* Tags */}
+                    <div className="mt-8">
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
+                                Tags
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setShowTagManager(true)}
+                                className="text-xs text-gray-400 hover:text-black transition-colors font-medium"
+                            >
+                                Manage tags
+                            </button>
+                        </div>
+                        {tags.length === 0 ? (
+                            <p className="text-xs text-gray-400">No tags yet. <button type="button" onClick={() => setShowTagManager(true)} className="underline">Create one</button></p>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {tags.map(tag => (
+                                    <button
+                                        type="button"
+                                        key={tag.id}
+                                        onClick={() => setSelectedTagIds(prev =>
+                                            prev.includes(tag.id) ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
+                                        )}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                                            selectedTagIds.includes(tag.id)
+                                                ? 'border-transparent text-white'
+                                                : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300'
+                                        }`}
+                                        style={selectedTagIds.includes(tag.id) ? { backgroundColor: tag.color } : {}}
+                                    >
+                                        <span
+                                            className="w-2 h-2 rounded-full shrink-0"
+                                            style={{ backgroundColor: selectedTagIds.includes(tag.id) ? 'rgba(255,255,255,0.8)' : tag.color }}
+                                        />
+                                        {tag.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {showTagManager && (
+                        <TagManager
+                            onClose={() => {
+                                setShowTagManager(false);
+                                api.get('/tags').then(r => setTags(r.data)).catch(() => {});
+                            }}
+                        />
+                    )}
 
                     {/* Footer */}
                     <div className="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between">

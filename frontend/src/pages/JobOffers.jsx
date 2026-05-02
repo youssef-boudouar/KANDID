@@ -158,6 +158,21 @@ function JobOffers() {
                                         </span>
                                     </div>
 
+                                    {/* Tag Pills */}
+                                    {job.tags && job.tags.length > 0 && (
+                                        <div className="mt-2 flex flex-wrap gap-1">
+                                            {job.tags.map(tag => (
+                                                <span
+                                                    key={tag.id}
+                                                    className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                                                    style={{ backgroundColor: `${tag.color}18`, color: tag.color }}
+                                                >
+                                                    {tag.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {/* Divider */}
                                     <div className="mt-5 border-t border-gray-50" />
 

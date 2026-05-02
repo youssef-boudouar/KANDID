@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
 import { useToast, ToastContainer } from '../components/Toast';
+import TagManager from './TagManager';
 
 function EditJob() {
     const { id } = useParams();
@@ -12,6 +13,9 @@ function EditJob() {
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [tags, setTags] = useState([]);
+    const [selectedTagIds, setSelectedTagIds] = useState([]);
+    const [showTagManager, setShowTagManager] = useState(false);
     const { toasts, show: showToast } = useToast();
 
     useEffect(() => {
@@ -19,6 +23,7 @@ function EditJob() {
             setTitle(response.data.title);
             setDescription(response.data.description);
             setStatus(response.data.status);
+            setSelectedTagIds(response.data.tags?.map(t => t.id) || []);
             setLoading(false);
         }).catch(() => {
             setError('Failed to load job offer');
@@ -26,12 +31,14 @@ function EditJob() {
         });
     }, []);
 
+    useEffect(() => {
+        api.get('/tags').then(r => setTags(r.data)).catch(() => {});
+    }, []);
+
     const handleSubmit = () => {
         api.put(`/job-offers/${id}`, { title, description, status })
-        .then(() => {
-            showToast('Job offer updated successfully');
-            navigate('/job-offers');
-        })
+        .then(() => api.post(`/job-offers/${id}/tags`, { tag_ids: selectedTagIds }))
+        .then(() => navigate('/job-offers'))
         .catch(() => {
             setError('Failed to update job offer');
             showToast('Failed to update job offer', 'error');
@@ -126,6 +133,57 @@ function EditJob() {
                             className="w-full h-64 p-5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300"
                         />
                     </div>
+
+                    {/* Tags */}
+                    <div className="mt-8">
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
+                                Tags
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setShowTagManager(true)}
+                                className="text-xs text-gray-400 hover:text-black transition-colors font-medium"
+                            >
+                                Manage tags
+                            </button>
+                        </div>
+                        {tags.length === 0 ? (
+                            <p className="text-xs text-gray-400">No tags yet. <button type="button" onClick={() => setShowTagManager(true)} className="underline">Create one</button></p>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {tags.map(tag => (
+                                    <button
+                                        type="button"
+                                        key={tag.id}
+                                        onClick={() => setSelectedTagIds(prev =>
+                                            prev.includes(tag.id) ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
+                                        )}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                                            selectedTagIds.includes(tag.id)
+                                                ? 'border-transparent text-white'
+                                                : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300'
+                                        }`}
+                                        style={selectedTagIds.includes(tag.id) ? { backgroundColor: tag.color } : {}}
+                                    >
+                                        <span
+                                            className="w-2 h-2 rounded-full shrink-0"
+                                            style={{ backgroundColor: selectedTagIds.includes(tag.id) ? 'rgba(255,255,255,0.8)' : tag.color }}
+                                        />
+                                        {tag.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {showTagManager && (
+                        <TagManager
+                            onClose={() => {
+                                setShowTagManager(false);
+                                api.get('/tags').then(r => setTags(r.data)).catch(() => {});
+                            }}
+                        />
+                    )}
 
                     {/* Footer */}
                     <div className="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between">
