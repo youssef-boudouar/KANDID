@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
@@ -57,6 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/team/invite', [AuthController::class, 'invite']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/activities', [ActivityController::class, 'index']);
 
 
     Route::middleware(AdminMiddleware::class)->group(function () {

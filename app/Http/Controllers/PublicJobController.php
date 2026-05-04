@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Application;
 use App\Models\Candidate;
 use App\Models\JobOffer;
 use App\Http\Requests\ApplyToJobRequest;
+use App\Mail\NewApplicationNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PublicJobController extends Controller
 {
@@ -25,7 +28,7 @@ class PublicJobController extends Controller
 
     public function apply(ApplyToJobRequest $request, $id)
     {
-        $job = JobOffer::where('status', 'active')->findOrFail($id);
+        $job = JobOffer::where('status', 'active')->with('creator')->findOrFail($id);
 
         $validated = $request->validated();
 
@@ -55,12 +58,26 @@ class PublicJobController extends Controller
             $candidate->save();
         }
 
-        Application::create([
+        $application = Application::create([
             'candidate_id' => $candidate->id,
             'job_offer_id' => $job->id,
             'status' => 'screening',
             'kanban_order' => 0,
         ]);
+
+        Activity::log(
+            $job->company_id,
+            null,
+            'application_created',
+            'application',
+            $application->id,
+            "{$candidate->first_name} {$candidate->last_name} applied to {$job->title}"
+        );
+
+        if ($job->creator && $job->creator->email) {
+            Mail::to($job->creator->email)
+                ->queue(new NewApplicationNotification($candidate, $job, $application));
+        }
 
         return response()->json([
             'message' => 'Application submitted successfully!'

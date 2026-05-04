@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Services\ApplicationService;
 use App\Http\Requests\MoveApplicationRequest;
 use App\Http\Resources\ApplicationResource;
@@ -39,6 +40,15 @@ class ApplicationController extends Controller
         if (!$application) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
+
+        Activity::log(
+            $request->user()->company_id,
+            $request->user()->id,
+            'status_changed',
+            'application',
+            $application->id,
+            $request->user()->name . ' moved candidate to ' . $request->validated()['status']
+        );
 
         return new ApplicationResource($application);
     }

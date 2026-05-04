@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Application;
 use App\Models\JobOffer;
 use App\Models\Note;
@@ -45,6 +46,15 @@ class NoteController extends Controller
         ]);
 
         $note->load('user:id,name');
+
+        Activity::log(
+            $request->user()->company_id,
+            $request->user()->id,
+            'note_added',
+            'application',
+            $application->id,
+            $request->user()->name . ' added a note'
+        );
 
         return (new NoteResource($note))->response()->setStatusCode(201);
     }
