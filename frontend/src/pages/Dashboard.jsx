@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
+import { Skeleton, SkeletonStatCard, SkeletonCard } from '../components/Skeleton';
 
 function Dashboard() {
     const [stats, setStats] = useState(null);
@@ -40,8 +41,13 @@ function Dashboard() {
             <div className="max-w-7xl mx-auto px-8 py-8">
 
                 {loading ? (
-                    <div className="flex items-center justify-center py-32">
-                        <span className="text-gray-400 text-sm">Loading...</span>
+                    <div>
+                        <div className="grid grid-cols-4 gap-4 mt-8">
+                            {[...Array(4)].map((_, i) => <SkeletonStatCard key={i} />)}
+                        </div>
+                        <div className="mt-8 space-y-3">
+                            {[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}
+                        </div>
                     </div>
                 ) : (
                     <>

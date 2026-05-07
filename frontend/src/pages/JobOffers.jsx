@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
+import { SkeletonCard } from '../components/Skeleton';
 
 function JobOffers() {
     const navigate = useNavigate();
@@ -9,11 +10,13 @@ function JobOffers() {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [companyName, setCompanyName] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         api.get('/job-offers').then(response => {
             setJobs(response.data);
-        });
+            setLoading(false);
+        }).catch(() => { setLoading(false); });
 
         api.get('/user').then(response => {
             setCompanyName(response.data.company?.name || '');
@@ -82,7 +85,11 @@ function JobOffers() {
                 </div>
 
                 {/* Job Cards Grid */}
-                {filteredJobs.length === 0 ? (
+                {loading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+                    </div>
+                ) : filteredJobs.length === 0 ? (
                     <div className="bg-white border border-gray-200 rounded-2xl py-20 text-center">
                         <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round">
