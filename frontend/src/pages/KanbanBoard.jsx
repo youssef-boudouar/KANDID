@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import RecruiterNavbar from "../components/RecruiterNavbar";
 import { useToast, ToastContainer } from "../components/Toast";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api$/, '');
 
@@ -22,6 +23,11 @@ function KanbanBoard() {
     const [currentUserId, setCurrentUserId] = useState(null);
     const navigate = useNavigate();
     const { toasts, show: showToast } = useToast();
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [bulkTargetStatus, setBulkTargetStatus] = useState('');
+    const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+    const [bulkConfirmMessage, setBulkConfirmMessage] = useState('');
+    const [bulkConfirmAction, setBulkConfirmAction] = useState(null);
 
     useEffect(() => {
         api.get(`/job-offers/${id}`)
@@ -47,15 +53,11 @@ function KanbanBoard() {
         const results = [];
 
         for (let i = 0; i < applications.length; i++) {
-            const fullName =
-                applications[i].candidate.first_name +
-                " " +
-                applications[i].candidate.last_name;
+            const fullName = applications[i].candidate.first_name + ' ' + applications[i].candidate.last_name;
+            const emailMatch = (applications[i].candidate.email || '').toLowerCase().includes(searchQuery.toLowerCase());
+            const nameMatch = fullName.toLowerCase().includes(searchQuery.toLowerCase());
 
-            if (
-                applications[i].status === status &&
-                fullName.toLowerCase().includes(searchQuery.toLowerCase())
-            ) {
+            if (applications[i].status === status && (nameMatch || emailMatch)) {
                 results.push(applications[i]);
             }
         }
@@ -349,6 +351,22 @@ function KanbanBoard() {
                                                                     {...provided.dragHandleProps} // makes element the thing you grab to drag
                                                                     className="group bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-grab active:cursor-grabbing"
                                                                 >
+                                                                    <label
+                                                                        className="flex items-center gap-1.5 mb-2 cursor-pointer w-fit"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={selectedIds.has(app.id)}
+                                                                            onChange={() => setSelectedIds(prev => {
+                                                                                const next = new Set(prev);
+                                                                                next.has(app.id) ? next.delete(app.id) : next.add(app.id);
+                                                                                return next;
+                                                                            })}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="w-3.5 h-3.5 rounded accent-black cursor-pointer"
+                                                                        />
+                                                                    </label>
                                                                     {/* Card top */}
                                                                     <div className="flex items-start gap-3">
                                                                         <div
@@ -566,6 +584,74 @@ function KanbanBoard() {
                     </div>
                 </DragDropContext>
             </div>
+
+            {selectedIds.size > 0 && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-gray-900 text-white rounded-2xl shadow-2xl px-6 py-3 flex items-center gap-4">
+                    <span className="text-sm font-semibold">{selectedIds.size} selected</span>
+                    <select
+                        value={bulkTargetStatus}
+                        onChange={e => setBulkTargetStatus(e.target.value)}
+                        className="bg-gray-800 text-white rounded-lg px-3 py-1.5 text-sm border border-gray-700 focus:outline-none"
+                    >
+                        <option value="">Move to...</option>
+                        {['screening','interview','technical','hired','rejected'].map(s => (
+                            <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={() => {
+                            if (!bulkTargetStatus) return;
+                            const ids = [...selectedIds];
+                            const updates = ids.map((appId, i) => ({
+                                id: appId,
+                                status: bulkTargetStatus,
+                                kanban_order: i,
+                            }));
+                            setApplications(prev => prev.map(a =>
+                                selectedIds.has(a.id) ? { ...a, status: bulkTargetStatus } : a
+                            ));
+                            api.put('/applications/reorder', { applications: updates });
+                            setSelectedIds(new Set());
+                            setBulkTargetStatus('');
+                        }}
+                        disabled={!bulkTargetStatus}
+                        className="px-3 py-1.5 bg-white text-gray-900 rounded-lg text-sm font-semibold disabled:opacity-40 hover:bg-gray-100 transition-colors"
+                    >
+                        Apply
+                    </button>
+                    <button
+                        onClick={() => {
+                            setBulkConfirmMessage(`Delete ${selectedIds.size} application(s)? This cannot be undone.`);
+                            setBulkConfirmAction(() => () => {
+                                const ids = [...selectedIds];
+                                Promise.all(ids.map(appId => api.delete(`/applications/${appId}`))).then(() => {
+                                    setApplications(prev => prev.filter(a => !selectedIds.has(a.id)));
+                                    setSelectedIds(new Set());
+                                }).catch(() => showToast('Failed to delete some applications', 'error'));
+                            });
+                            setBulkConfirmOpen(true);
+                        }}
+                        className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600 transition-colors"
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => setSelectedIds(new Set())}
+                        className="text-gray-400 hover:text-white text-sm transition-colors"
+                    >
+                        Deselect all
+                    </button>
+                </div>
+            )}
+            <ConfirmDialog
+                open={bulkConfirmOpen}
+                title="Confirm Delete"
+                message={bulkConfirmMessage}
+                onConfirm={() => { setBulkConfirmOpen(false); bulkConfirmAction?.(); }}
+                onCancel={() => setBulkConfirmOpen(false)}
+                confirmLabel="Delete"
+                danger
+            />
 
             {/* ─── Candidate Detail Side Panel ─── */}
             {selectedApp && (
