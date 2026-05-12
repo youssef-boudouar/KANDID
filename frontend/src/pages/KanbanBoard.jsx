@@ -624,10 +624,15 @@ function KanbanBoard() {
                             setBulkConfirmMessage(`Delete ${selectedIds.size} application(s)? This cannot be undone.`);
                             setBulkConfirmAction(() => () => {
                                 const ids = [...selectedIds];
-                                Promise.all(ids.map(appId => api.delete(`/applications/${appId}`))).then(() => {
-                                    setApplications(prev => prev.filter(a => !selectedIds.has(a.id)));
-                                    setSelectedIds(new Set());
-                                }).catch(() => showToast('Failed to delete some applications', 'error'));
+                                Promise.allSettled(ids.map(appId => api.delete(`/applications/${appId}`))).then(results => {
+                                    const succeeded = new Set(
+                                        ids.filter((_, i) => results[i].status === 'fulfilled')
+                                    );
+                                    const failedCount = results.filter(r => r.status === 'rejected').length;
+                                    setApplications(prev => prev.filter(a => !succeeded.has(a.id)));
+                                    setSelectedIds(new Set(ids.filter(id => !succeeded.has(id))));
+                                    if (failedCount > 0) showToast(`${failedCount} application(s) could not be deleted`, 'error');
+                                });
                             });
                             setBulkConfirmOpen(true);
                         }}
