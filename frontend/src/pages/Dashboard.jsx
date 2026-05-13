@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
 import { Skeleton, SkeletonStatCard, SkeletonCard } from '../components/Skeleton';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [userName, setUserName] = useState('');
+    const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,6 +24,8 @@ function Dashboard() {
                 setLoading(false);
             })
             .catch(() => { setLoading(false); });
+
+        api.get('/activities').then(r => setActivities(r.data)).catch(() => {});
     }, []);
 
     const getBarColor = (status) => {
@@ -89,6 +93,38 @@ function Dashboard() {
                             </div>
                         </div>
 
+                        {/* Extra stats row */}
+                        {stats && (
+                            <div className="grid grid-cols-3 gap-4 mt-4">
+                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-amber-500" />
+                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">This Week</span>
+                                    </div>
+                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.this_week ?? 0}</div>
+                                    {stats.weekly_delta !== undefined && (
+                                        <div className={`text-xs mt-1 font-medium ${stats.weekly_delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                            {stats.weekly_delta >= 0 ? '+' : ''}{stats.weekly_delta}% vs last week
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-violet-500" />
+                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Conversion Rate</span>
+                                    </div>
+                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.conversion_rate ?? 0}%</div>
+                                </div>
+                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-cyan-500" />
+                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Hired</span>
+                                    </div>
+                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.hired_count ?? 0}</div>
+                                </div>
+                            </div>
+                        )}
+
                         {stats.total_applications === 0 ? (
                             <div className="mt-8 bg-white rounded-2xl border border-gray-200 py-16 text-center">
                                 <h3 className="text-lg font-bold text-gray-900">No applications yet</h3>
@@ -111,34 +147,50 @@ function Dashboard() {
                                     ))}
                                 </div>
 
-                                {/* Recent Applications */}
+                                {/* 14-Day Trend */}
+                                {stats?.trend && stats.trend.length > 0 && (
+                                    <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-6">
+                                        <h2 className="text-sm font-bold text-gray-900 mb-4">Applications — Last 14 Days</h2>
+                                        <ResponsiveContainer width="100%" height={120}>
+                                            <LineChart data={stats.trend}>
+                                                <XAxis
+                                                    dataKey="date"
+                                                    tick={{ fontSize: 10, fill: '#9ca3af' }}
+                                                    tickFormatter={d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                    interval={3}
+                                                />
+                                                <YAxis hide allowDecimals={false} />
+                                                <Tooltip
+                                                    formatter={(v) => [v, 'Applications']}
+                                                    labelFormatter={(l) => new Date(l).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                />
+                                                <Line type="monotone" dataKey="count" stroke="#0a0a0a" strokeWidth={2} dot={false} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Activity Feed */}
                                 <div className="mt-8">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-bold text-gray-900">Recent Applications</h2>
-                                        <span
-                                            onClick={() => navigate('/job-offers')}
-                                            className="text-sm text-gray-400 hover:text-black cursor-pointer"
-                                        >
-                                            View Pipeline →
-                                        </span>
+                                        <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
                                     </div>
-                                    {stats.recent_applications.map((app) => (
-                                        <div key={app.id} className="bg-white rounded-xl border border-gray-200 p-4 mb-3 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">
-                                                    {(app.candidate?.first_name?.[0] || '').toUpperCase()}{(app.candidate?.last_name?.[0] || '').toUpperCase()}
-                                                </div>
-                                                <span className="text-sm font-semibold text-gray-900">
-                                                    {app.candidate?.first_name} {app.candidate?.last_name}
-                                                </span>
-                                                <span className="text-gray-300 mx-2">→</span>
-                                                <span className="text-sm text-gray-500">{app.job_offer?.title}</span>
-                                            </div>
-                                            <span className="text-xs text-gray-400">
-                                                {new Date(app.created_at).toLocaleDateString()}
-                                            </span>
+                                    {activities.length === 0 ? (
+                                        <div className="bg-white rounded-2xl border border-gray-200 py-10 text-center">
+                                            <p className="text-sm text-gray-400">No activity yet. Applications and status changes will appear here.</p>
                                         </div>
-                                    ))}
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {activities.map(act => (
+                                                <div key={act.id} className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center justify-between">
+                                                    <span className="text-sm text-gray-700">{act.description}</span>
+                                                    <span className="text-xs text-gray-400 shrink-0 ml-4">
+                                                        {new Date(act.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         )}
