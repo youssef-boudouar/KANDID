@@ -38,7 +38,7 @@ class AuthService
 
             $company = Company::create([
                 'name' => $validatedCompanyInfos['company_name'],
-                'domain' => $validatedCompanyInfos['domain'],
+                'domain' => $validatedCompanyInfos['domain'] ?? null,
             ]);
 
             $user = User::create(array_merge($validatedUserInfos, ['company_id' => $company->id, 'role' => 'recruiter']));
