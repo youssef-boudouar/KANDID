@@ -8,14 +8,19 @@ function PublicJobs() {
     const [jobs, setJobs] = useState([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
+    const [meta, setMeta] = useState(null);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        api.get('/public/jobs')
-            .then((response) => {
-                setJobs(response.data);
+        setLoading(true);
+        api.get(`/public/jobs?page=${page}`)
+            .then(r => {
+                setJobs(r.data.data);     // Laravel pagination wraps in 'data'
+                setMeta(r.data.meta);
                 setLoading(false);
-            });
-    }, []);
+            })
+            .catch(() => setLoading(false));
+    }, [page]);
 
     const filteredJobs = jobs.filter(job =>
         job.title.toLowerCase().includes(search.toLowerCase())
@@ -136,6 +141,26 @@ function PublicJobs() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {meta && meta.last_page > 1 && (
+                    <div className="flex items-center justify-center gap-3 mt-8">
+                        <button
+                            onClick={() => setPage(p => p - 1)}
+                            disabled={page === 1}
+                            className="px-4 py-2 rounded-xl text-sm font-semibold bg-white border border-gray-200 text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors"
+                        >
+                            ← Previous
+                        </button>
+                        <span className="text-sm text-gray-500">Page {page} of {meta.last_page}</span>
+                        <button
+                            onClick={() => setPage(p => p + 1)}
+                            disabled={page === meta.last_page}
+                            className="px-4 py-2 rounded-xl text-sm font-semibold bg-white border border-gray-200 text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors"
+                        >
+                            Next →
+                        </button>
                     </div>
                 )}
             </section>

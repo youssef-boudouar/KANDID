@@ -13,9 +13,12 @@ use Illuminate\Support\Facades\Mail;
 
 class PublicJobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = JobOffer::where('status', 'active')->with('company:id,name')->orderBy('created_at', 'desc')->get();
+        $jobs = JobOffer::where('status', 'active')
+            ->with('company:id,name')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
 
         return response()->json($jobs);
     }
