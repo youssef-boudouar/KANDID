@@ -16,11 +16,15 @@ function PublicJobs() {
         api.get(`/public/jobs?page=${page}`)
             .then(r => {
                 setJobs(r.data.data);     // Laravel pagination wraps in 'data'
-                setMeta(r.data.meta);
+                setMeta(r.data);   // Laravel puts current_page, last_page at top level
                 setLoading(false);
             })
             .catch(() => setLoading(false));
     }, [page]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [search]);
 
     const filteredJobs = jobs.filter(job =>
         job.title.toLowerCase().includes(search.toLowerCase())

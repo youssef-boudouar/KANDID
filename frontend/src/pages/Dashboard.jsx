@@ -53,6 +53,10 @@ function Dashboard() {
                             {[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}
                         </div>
                     </div>
+                ) : !stats ? (
+                    <div className="mt-8 bg-white rounded-2xl border border-gray-200 py-16 text-center">
+                        <p className="text-sm text-gray-400">Failed to load dashboard. Please refresh.</p>
+                    </div>
                 ) : (
                     <>
                         {/* Header */}
@@ -94,36 +98,27 @@ function Dashboard() {
                         </div>
 
                         {/* Extra stats row */}
-                        {stats && (
-                            <div className="grid grid-cols-3 gap-4 mt-4">
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-amber-500" />
-                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">This Week</span>
-                                    </div>
-                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.this_week ?? 0}</div>
-                                    {stats.weekly_delta !== undefined && (
-                                        <div className={`text-xs mt-1 font-medium ${stats.weekly_delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                                            {stats.weekly_delta >= 0 ? '+' : ''}{stats.weekly_delta}% vs last week
-                                        </div>
-                                    )}
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                                    <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">This Week</span>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-violet-500" />
-                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Conversion Rate</span>
+                                <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.this_week ?? 0}</div>
+                                {stats.weekly_delta !== undefined && (
+                                    <div className={`text-xs mt-1 font-medium ${stats.weekly_delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                        {stats.weekly_delta >= 0 ? '+' : ''}{stats.weekly_delta}% vs last week
                                     </div>
-                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.conversion_rate ?? 0}%</div>
-                                </div>
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-cyan-500" />
-                                        <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Hired</span>
-                                    </div>
-                                    <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.hired_count ?? 0}</div>
-                                </div>
+                                )}
                             </div>
-                        )}
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-violet-500" />
+                                    <span className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Conversion Rate</span>
+                                </div>
+                                <div className="text-3xl font-extrabold text-gray-900 mt-2">{stats.conversion_rate ?? 0}%</div>
+                            </div>
+                        </div>
 
                         {stats.total_applications === 0 ? (
                             <div className="mt-8 bg-white rounded-2xl border border-gray-200 py-16 text-center">

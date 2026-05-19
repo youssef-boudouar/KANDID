@@ -41,7 +41,7 @@ class JobOfferTest extends TestCase
 
         $response = $this->getJson('/api/job-offers', ['Authorization' => "Bearer $tokenA"]);
         $response->assertStatus(200);
-        $this->assertEmpty(collect($response->json())->where('title', 'B Job'));
+        $response->assertJsonMissing(['title' => 'B Job']);
     }
 
     public function test_validation_fails_without_title(): void
