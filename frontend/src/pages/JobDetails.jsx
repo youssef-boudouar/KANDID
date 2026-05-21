@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 function JobDetails() {
     const { id } = useParams();
@@ -14,10 +14,7 @@ function JobDetails() {
     const [inviteEmail, setInviteEmail] = useState('');
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        axios.get(`http://localhost:8000/api/job-offers/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
+        api.get(`/job-offers/${id}`).then(response => {
             setJob(response.data);
             setLoading(false);
         }).catch(() => {
@@ -25,9 +22,7 @@ function JobDetails() {
             setLoading(false);
         });
 
-        axios.get('http://localhost:8000/api/user', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
+        api.get('/user').then(response => {
             setUserName(response.data.name);
             setCompanyName(response.data.company?.name || '');
         });
@@ -35,10 +30,7 @@ function JobDetails() {
 
     const handleDelete = () => {
         if (!window.confirm('Are you sure you want to delete this job offer?')) return; // cancel
-        const token = localStorage.getItem('token');
-        axios.delete(`http://localhost:8000/api/job-offers/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(() => {
+        api.delete(`/job-offers/${id}`).then(() => {
             navigate('/job-offers');
         }).catch(() => {
             setError('Failed to delete job offer');
@@ -101,11 +93,8 @@ function JobDetails() {
                                     <button
                                         onClick={() => {
                                             if (!inviteEmail) return;
-                                            const token = localStorage.getItem('token');
-                                            axios.post('http://localhost:8000/api/team/invite', {
+                                            api.post('/team/invite', {
                                                 email: inviteEmail,
-                                            }, {
-                                                headers: { Authorization: `Bearer ${token}` }
                                             }).then(() => {
                                                 alert('Invitation sent!');
                                                 setInviteEmail('');

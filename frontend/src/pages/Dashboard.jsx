@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 function Dashboard() {
     const [stats, setStats] = useState(null);
@@ -12,17 +12,14 @@ function Dashboard() {
     const [inviteEmail, setInviteEmail] = useState('');
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const headers = { Authorization: `Bearer ${token}` };
-
-        axios.get('http://localhost:8000/api/user', { headers })
+        api.get('/user')
             .then(response => {
                 setUserName(response.data.name);
                 setCompanyName(response.data.company?.name || '');
             })
             .catch(() => { setLoading(false); });
 
-        axios.get('http://localhost:8000/api/dashboard', { headers })
+        api.get('/dashboard')
             .then(response => {
                 setStats(response.data);
                 setLoading(false);
@@ -83,11 +80,8 @@ function Dashboard() {
                                     <button
                                         onClick={() => {
                                             if (!inviteEmail) return;
-                                            const token = localStorage.getItem('token');
-                                            axios.post('http://localhost:8000/api/team/invite', {
+                                            api.post('/team/invite', {
                                                 email: inviteEmail,
-                                            }, {
-                                                headers: { Authorization: `Bearer ${token}` }
                                             }).then(() => {
                                                 alert('Invitation sent!');
                                                 setInviteEmail('');

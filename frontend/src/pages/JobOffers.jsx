@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 function JobOffers() {
     const navigate = useNavigate();
@@ -13,17 +13,11 @@ function JobOffers() {
     const [inviteEmail, setInviteEmail] = useState('');
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-
-        axios.get('http://localhost:8000/api/job-offers', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
+        api.get('/job-offers').then(response => {
             setJobs(response.data);
         });
 
-        axios.get('http://localhost:8000/api/user', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
+        api.get('/user').then(response => {
             setUserName(response.data.name);
             setCompanyName(response.data.company?.name || '');
         });
@@ -84,11 +78,8 @@ function JobOffers() {
                                     <button
                                         onClick={() => {
                                             if (!inviteEmail) return;
-                                            const token = localStorage.getItem('token');
-                                            axios.post('http://localhost:8000/api/team/invite', {
+                                            api.post('/team/invite', {
                                                 email: inviteEmail,
-                                            }, {
-                                                headers: { Authorization: `Bearer ${token}` }
                                             }).then(() => {
                                                 alert('Invitation sent!');
                                                 setInviteEmail('');

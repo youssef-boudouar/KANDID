@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 function PublicJobs() {
     const navigate = useNavigate();
@@ -9,7 +9,7 @@ function PublicJobs() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/public/jobs')
+        api.get('/public/jobs')
             .then((response) => {
                 setJobs(response.data);
                 setLoading(false);

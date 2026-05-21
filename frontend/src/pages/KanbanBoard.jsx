@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -23,29 +23,19 @@ function KanbanBoard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        axios
-            .get(`http://localhost:8000/api/job-offers/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api.get(`/job-offers/${id}`)
             .then((response) => {
                 setJobTitle(response.data.title);
                 setJobStatus(response.data.status);
             });
-        axios
-            .get(`http://localhost:8000/api/job-offers/${id}/applications`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api.get(`/job-offers/${id}/applications`)
             .then((response) => {
                 setApplications(response.data);
                 setLoading(false);
             })
             .catch(() => { setLoading(false); });
 
-        axios
-            .get("http://localhost:8000/api/user", {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api.get("/user")
             .then((response) => {
                 setUserName(response.data.name);
                 setCompanyName(response.data.company?.name || "");
@@ -96,15 +86,11 @@ function KanbanBoard() {
         setApplications(updatedApplications);
 
         // update dragged item on backend
-        const token = localStorage.getItem("token");
-        axios.put(
-            `http://localhost:8000/api/applications/${result.draggableId}/move`,
+        api.put(
+            `/applications/${result.draggableId}/move`,
             {
                 status: result.destination.droppableId,
                 kanban_order: result.destination.index,
-            },
-            {
-                headers: { Authorization: `Bearer ${token}` },
             },
         );
     };
@@ -112,11 +98,8 @@ function KanbanBoard() {
     const openPanel = (app) => {
         setSelectedApp(app);
         setNewNote(""); // Clear note input
-        const token = localStorage.getItem("token");
-        axios
-            .get(`http://localhost:8000/api/applications/${app.id}/notes`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api
+            .get(`/applications/${app.id}/notes`)
             .then((response) => {
                 setNotes(response.data);
             });
@@ -130,16 +113,10 @@ function KanbanBoard() {
 
     const addNote = () => {
         if (!newNote.trim()) return;
-        const token = localStorage.getItem("token");
-        axios
+        api
             .post(
-                `http://localhost:8000/api/applications/${selectedApp.id}/notes`,
-                {
-                    content: newNote,
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                },
+                `/applications/${selectedApp.id}/notes`,
+                { content: newNote },
             )
             .then((response) => {
                 setNotes([response.data, ...notes]); //add new note to top of the list
@@ -148,11 +125,8 @@ function KanbanBoard() {
     };
 
     const deleteNote = (noteId) => {
-        const token = localStorage.getItem("token");
-        axios
-            .delete(`http://localhost:8000/api/notes/${noteId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api
+            .delete(`/notes/${noteId}`)
             .then(() => {
                 setNotes(notes.filter((note) => note.id !== noteId));
             });
@@ -236,19 +210,10 @@ function KanbanBoard() {
                                     <button
                                         onClick={() => {
                                             if (!inviteEmail) return;
-                                            const token =
-                                                localStorage.getItem("token");
-                                            axios
+                                            api
                                                 .post(
-                                                    "http://localhost:8000/api/team/invite",
-                                                    {
-                                                        email: inviteEmail,
-                                                    },
-                                                    {
-                                                        headers: {
-                                                            Authorization: `Bearer ${token}`,
-                                                        },
-                                                    },
+                                                    "/team/invite",
+                                                    { email: inviteEmail },
                                                 )
                                                 .then(() => {
                                                     alert("Invitation sent!");

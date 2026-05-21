@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -10,20 +10,17 @@ function AdminDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        const headers = { Authorization: `Bearer ${token}` };
-
-        axios.get("http://localhost:8000/api/admin/stats", { headers })
+        api.get("/admin/stats")
             .then((response) => {
                 setStats(response.data);
             });
 
-        axios.get("http://localhost:8000/api/admin/companies", { headers })
+        api.get("/admin/companies")
             .then((response) => {
                 setCompanies(response.data);
             });
 
-        axios.get("http://localhost:8000/api/admin/users", { headers })
+        api.get("/admin/users")
             .then((response) => {
                 setUsers(response.data);
                 setLoading(false);
@@ -32,11 +29,8 @@ function AdminDashboard() {
 
     const deleteCompany = (id) => {
         if (!window.confirm("Delete this company and all its data?")) return;
-        const token = localStorage.getItem("token");
-        axios
-            .delete(`http://localhost:8000/api/admin/companies/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api
+            .delete(`/admin/companies/${id}`)
             .then(() => {
                 setCompanies(companies.filter((c) => c.id !== id));
             });
@@ -44,11 +38,8 @@ function AdminDashboard() {
 
     const deleteUser = (id) => {
         if (!window.confirm("Delete this user?")) return;
-        const token = localStorage.getItem("token");
-        axios
-            .delete(`http://localhost:8000/api/admin/users/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+        api
+            .delete(`/admin/users/${id}`)
             .then(() => {
                 setUsers(users.filter((u) => u.id !== id));
             });

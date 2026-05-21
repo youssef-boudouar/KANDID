@@ -1,5 +1,5 @@
 import { useState} from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Register() {
@@ -22,7 +22,7 @@ function Register() {
         setLoading(true);
         setError(""); // clear previous error message
 
-        axios.post("http://localhost:8000/api/register", {
+        api.post("/register", {
                 ...(inviteToken ? {} : { company_name: companyName, domain }),
                 name,
                 email,

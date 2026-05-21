@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 function PublicJobApply() {
     const { id } = useParams();
@@ -18,7 +18,7 @@ function PublicJobApply() {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        axios.get(`http://localhost:8000/api/public/jobs/${id}`)
+        api.get(`/public/jobs/${id}`)
             .then((response) => {
                 setJob(response.data);
                 setLoading(false);
@@ -45,7 +45,7 @@ function PublicJobApply() {
         formData.append('phone', phone);
         formData.append('resume', resumeRef.current.files[0]);
 
-        axios.post(`http://localhost:8000/api/public/jobs/${id}/apply`, formData)
+        api.post(`/public/jobs/${id}/apply`, formData)
         .then(() => {
             setSubmitted(true);
         })
