@@ -6,7 +6,7 @@ import RecruiterNavbar from "../components/RecruiterNavbar";
 import { useToast, ToastContainer } from "../components/Toast";
 import ConfirmDialog from "../components/ConfirmDialog";
 
-const STORAGE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api$/, '');
+const STORAGE_URL = (import.meta.env.VITE_API_URL).replace(/\/api$/, '');
 
 function KanbanBoard() {
     const status = ["screening", "interview", "technical", "hired", "rejected"];
