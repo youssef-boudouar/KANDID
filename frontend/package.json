@@ -12,9 +12,14 @@
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@tailwindcss/vite": "^4.2.2",
+    "@tiptap/extension-placeholder": "^3.25.0",
+    "@tiptap/react": "^3.25.0",
+    "@tiptap/starter-kit": "^3.25.0",
     "axios": "^1.13.6",
+    "dompurify": "^3.4.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-easy-crop": "^5.5.7",
     "react-router-dom": "^7.13.1",
     "recharts": "^3.8.1",
     "tailwindcss": "^4.2.2"
