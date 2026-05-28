@@ -14,6 +14,10 @@ class Company extends Model
         'domain',
         'subscription_status',
         'settings',
+        'logo',
+        'description',
+        'website',
+        'created_by',
     ];
 
     protected function casts(): array

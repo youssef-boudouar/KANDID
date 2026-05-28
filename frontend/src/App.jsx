@@ -11,6 +11,8 @@ import PublicJobs from './pages/PublicJobs';
 import PublicJobApply from './pages/PublicJobApply';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
+import CompanyProfile from './pages/CompanyProfile';
 
 function App() {
     return (
@@ -29,6 +31,8 @@ function App() {
                     <Route path="/job-offers/:id/edit" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
                     <Route path="/job-offers/:id/pipeline" element={<ProtectedRoute><KanbanBoard /></ProtectedRoute>} />
 
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/company-profile" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
                     <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
                     <Route path="*" element={<Navigate to="/login" />} />

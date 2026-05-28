@@ -43,6 +43,9 @@ class AuthService
 
             $user = User::create(array_merge($validatedUserInfos, ['company_id' => $company->id, 'role' => 'recruiter']));
 
+            // Mark the registering user as the company owner
+            $company->update(['created_by' => $user->id]);
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return ['user' => $user, 'token' => $token];

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
@@ -24,10 +26,26 @@ Route::middleware('throttle:10,1')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // get company name for navbar
     Route::get('/user', function (Request $request) {
         return $request->user()->load('company');
     });
+    Route::patch('/user', function (Request $request) {
+        $request->validate(['sex' => 'required|in:male,female']);
+        $request->user()->update(['sex' => $request->sex]);
+        return $request->user()->load('company');
+    });
+
+    // Company profile
+    Route::get('/company', [CompanyController::class, 'show']);
+    Route::patch('/company', [CompanyController::class, 'update']);
+    Route::post('/company/logo', [CompanyController::class, 'uploadLogo']);
+    Route::delete('/company/logo', [CompanyController::class, 'deleteLogo']);
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/photo', [ProfileController::class, 'uploadPhoto']);
+    Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto']);
     // Job Offers CRUD
     Route::get('/job-offers', [JobOfferController::class, 'index']);
     Route::post('/job-offers', [JobOfferController::class, 'store']);
