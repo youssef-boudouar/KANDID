@@ -4,6 +4,7 @@ import api from '../api/axios';
 import RecruiterNavbar from '../components/RecruiterNavbar';
 import { useToast, ToastContainer } from '../components/Toast';
 import TagManager from './TagManager';
+import RichTextEditor from '../components/RichTextEditor';
 
 function EditJob() {
     const { id } = useParams();
@@ -126,11 +127,10 @@ function EditJob() {
                         <label className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold mb-3 block">
                             Job Description
                         </label>
-                        <textarea
+                        <RichTextEditor
                             value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={setDescription}
                             placeholder="Start typing the core responsibilities and requirements..."
-                            className="w-full h-64 p-5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300"
                         />
                     </div>
 
