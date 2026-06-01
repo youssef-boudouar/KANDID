@@ -11,6 +11,7 @@ class Candidate extends Model
         'last_name',
         'email',
         'phone',
+        'sex',
         'resume_path',
     ];
 

@@ -13,6 +13,7 @@ class ApplyToJobRequest extends FormRequest
             'last_name'  => 'required|string|max:20',
             'email'      => 'required|email',
             'phone'      => 'required|string|max:20',
+            'sex'        => 'nullable|in:male,female',
             'resume'     => 'required|file|mimes:pdf|max:2048',
         ];
     }

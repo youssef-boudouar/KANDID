@@ -12,6 +12,7 @@ class CandidateResource extends JsonResource
             'last_name'   => $this->last_name,
             'email'       => $this->email,
             'phone'       => $this->phone,
+            'sex'         => $this->sex,
             'resume_path' => $this->resume_path,
         ];
     }

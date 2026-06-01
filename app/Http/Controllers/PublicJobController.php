@@ -16,7 +16,8 @@ class PublicJobController extends Controller
     public function index(Request $request)
     {
         $jobs = JobOffer::where('status', 'active')
-            ->with('company:id,name')
+            ->with(['company:id,name,logo', 'tags:id,name,color'])
+            ->withCount('applications')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
@@ -24,7 +25,7 @@ class PublicJobController extends Controller
     }
     public function show($id)
     {
-        $job = JobOffer::where('status', 'active')->with('company:id,name')->findOrFail($id);
+        $job = JobOffer::where('status', 'active')->with(['company:id,name,logo', 'tags:id,name,color'])->findOrFail($id);
 
         return response()->json($job);
     }
@@ -49,15 +50,18 @@ class PublicJobController extends Controller
 
         if (!$candidate) {
             $candidate = Candidate::create([
-                'first_name' => $validated['first_name'],
-                'last_name' => $validated['last_name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
+                'first_name'  => $validated['first_name'],
+                'last_name'   => $validated['last_name'],
+                'email'       => $validated['email'],
+                'phone'       => $validated['phone'],
+                'sex'         => $validated['sex'] ?? null,
                 'resume_path' => $resumePath,
             ]);
-        }
-        else {
+        } else {
             $candidate->resume_path = $resumePath;
+            if (!empty($validated['sex'])) {
+                $candidate->sex = $validated['sex'];
+            }
             $candidate->save();
         }
 
