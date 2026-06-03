@@ -69,7 +69,7 @@ function Register() {
                     {/* Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-10 z-10">
                         <img
-                            src="/kandid_logo.png"
+                            src="/logo.png"
                             alt="Kandid"
                             className="h-6 w-auto object-contain mb-4 opacity-80 brightness-0 invert select-none"
                         />

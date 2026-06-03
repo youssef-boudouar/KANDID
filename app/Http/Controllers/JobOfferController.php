@@ -12,7 +12,15 @@ class JobOfferController extends Controller
 {
     public function index(Request $request)
     {
-        $jobOffers = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->with('tags')->get();
+        $jobOffers = JobOffer::forCompany($request->user()->company_id)
+            ->withCount('applications')
+            ->withCount(['applications as screening_count' => fn($q) => $q->where('status', 'screening')])
+            ->withCount(['applications as interview_count' => fn($q) => $q->where('status', 'interview')])
+            ->withCount(['applications as technical_count' => fn($q) => $q->where('status', 'technical')])
+            ->withCount(['applications as hired_count'     => fn($q) => $q->where('status', 'hired')])
+            ->withCount(['applications as rejected_count'  => fn($q) => $q->where('status', 'rejected')])
+            ->with('tags')
+            ->get();
 
         return JobOfferResource::collection($jobOffers);
     }
@@ -31,7 +39,15 @@ class JobOfferController extends Controller
 
     public function show(Request $request, $id)
     {
-        $jobOffer = JobOffer::forCompany($request->user()->company_id)->withCount('applications')->with('tags')->findOrFail($id);
+        $jobOffer = JobOffer::forCompany($request->user()->company_id)
+            ->withCount('applications')
+            ->withCount(['applications as screening_count' => fn($q) => $q->where('status', 'screening')])
+            ->withCount(['applications as interview_count' => fn($q) => $q->where('status', 'interview')])
+            ->withCount(['applications as technical_count' => fn($q) => $q->where('status', 'technical')])
+            ->withCount(['applications as hired_count'     => fn($q) => $q->where('status', 'hired')])
+            ->withCount(['applications as rejected_count'  => fn($q) => $q->where('status', 'rejected')])
+            ->with('tags')
+            ->findOrFail($id);
 
         return new JobOfferResource($jobOffer);
     }

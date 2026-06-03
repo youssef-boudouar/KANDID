@@ -45,8 +45,8 @@ class DashboardService
             ? round(($hiredCount / $totalApplications) * 100, 1)
             : 0;
 
-        // Last 14 days trend
-        $trend = collect(range(13, 0))->map(function ($daysAgo) use ($companyId) {
+        // Last 30 days trend
+        $trend = collect(range(29, 0))->map(function ($daysAgo) use ($companyId) {
             $date = Carbon::now()->subDays($daysAgo)->toDateString();
             $count = Application::whereHas('jobOffer', fn($q) => $q->where('company_id', $companyId))
                 ->whereDate('created_at', $date)
@@ -54,16 +54,29 @@ class DashboardService
             return ['date' => $date, 'count' => $count];
         })->values();
 
+        $topJobs = JobOffer::where('company_id', $companyId)
+            ->withCount('applications')
+            ->orderByDesc('applications_count')
+            ->limit(5)
+            ->get(['id', 'title', 'status'])
+            ->map(fn($j) => [
+                'id'                 => $j->id,
+                'title'              => $j->title,
+                'status'             => $j->status,
+                'applications_count' => $j->applications_count,
+            ]);
+
         return [
-            'active_jobs' => $activeJobs,
-            'total_jobs' => $totalJobs,
+            'active_jobs'        => $activeJobs,
+            'total_jobs'         => $totalJobs,
             'total_applications' => $totalApplications,
-            'hired_count' => $hiredCount,
-            'pipeline' => $pipeline,
-            'this_week'       => $thisWeek,
-            'weekly_delta'    => $weeklyDelta,
-            'conversion_rate' => $conversionRate,
-            'trend'           => $trend,
+            'hired_count'        => $hiredCount,
+            'pipeline'           => $pipeline,
+            'this_week'          => $thisWeek,
+            'weekly_delta'       => $weeklyDelta,
+            'conversion_rate'    => $conversionRate,
+            'trend'              => $trend,
+            'top_jobs'           => $topJobs,
         ];
     }
 }

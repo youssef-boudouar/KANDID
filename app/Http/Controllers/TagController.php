@@ -55,13 +55,13 @@ class TagController extends Controller
         $jobOffer = JobOffer::forCompany($request->user()->company_id)->findOrFail($jobId);
         $companyId = $request->user()->company_id;
         $validated = $request->validate([
-            'tag_ids'   => 'required|array',
+            'tag_ids'   => 'nullable|array',
             'tag_ids.*' => [
                 'integer',
                 Rule::exists('tags', 'id')->where('company_id', $companyId),
             ],
         ]);
-        $jobOffer->tags()->sync($validated['tag_ids']);
+        $jobOffer->tags()->sync($validated['tag_ids'] ?? []);
         return response()->json($jobOffer->load('tags'));
     }
 

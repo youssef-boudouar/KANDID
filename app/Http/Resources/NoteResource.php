@@ -11,8 +11,9 @@ class NoteResource extends JsonResource
             'content'        => $this->content,
             'application_id' => $this->application_id,
             'user'           => $this->whenLoaded('user', fn() => [
-                'id'   => $this->user->id,
-                'name' => $this->user->name,
+                'id'            => $this->user->id,
+                'name'          => $this->user->name,
+                'profile_photo' => $this->user->profile_photo,
             ]),
             'created_at'     => $this->created_at,
         ];
